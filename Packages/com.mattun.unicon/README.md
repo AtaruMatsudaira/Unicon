@@ -1,4 +1,4 @@
-# Dock Icon Changer for Unity
+# Unicon
 
 Customize Unity Editor dock icon on macOS. Easily distinguish between multiple Unity instances running in parallel.
 
@@ -25,7 +25,7 @@ Customize Unity Editor dock icon on macOS. Easily distinguish between multiple U
 
 1. Open **Window > Package Manager**
 2. Click **+** button and select **Add package from git URL...**
-3. Enter: `https://github.com/mattun/DockIconChanger.git?path=Packages/com.mattun.dockiconchanger`
+3. Enter: `https://github.com/mattun/Unicon.git?path=Packages/com.mattun.unicon`
 
 ### Via manifest.json
 
@@ -34,7 +34,7 @@ Add the following to your `Packages/manifest.json`:
 ```json
 {
   "dependencies": {
-    "com.mattun.dockiconchanger": "https://github.com/mattun/DockIconChanger.git?path=Packages/com.mattun.dockiconchanger"
+    "com.mattun.unicon": "https://github.com/mattun/Unicon.git?path=Packages/com.mattun.unicon"
   }
 }
 ```

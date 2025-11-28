@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "com.mattun.dockiconchanger": {
-      "version": "file:com.mattun.dockiconchanger",
+    "com.mattun.unicon": {
+      "version": "file:com.mattun.unicon",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}
