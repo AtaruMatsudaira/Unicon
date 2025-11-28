@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+
+# Claude Code
+.claude/
+.mcp.json
+
+# Requirements (development notes)
+requirements/
+
+# Unity Project (keep only package)
+mac_icon_changer/Library/
+mac_icon_changer/Temp/
+mac_icon_changer/Logs/
+mac_icon_changer/obj/
+mac_icon_changer/Builds/
+mac_icon_changer/UserSettings/
+mac_icon_changer/*.csproj
+mac_icon_changer/*.sln
+mac_icon_changer/*.sln.DotSettings.user
+
+# Xcode build artifacts
+DockIconPlugin/build/
+DockIconPlugin/DerivedData/
+*.xcuserstate
+*.xcuserdatad
