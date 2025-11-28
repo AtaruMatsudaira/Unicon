@@ -16,6 +16,10 @@
     "name": "mattun",
     "url": "https://github.com/mattun"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AtaruMatsudaira/Unicon.git"
+  },
   "license": "MIT",
   "type": "tool"
 }
