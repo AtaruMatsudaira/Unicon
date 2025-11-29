@@ -1,9 +1,9 @@
 {
   "dependencies": {
     "com.mattun.unicon": {
-      "version": "file:com.mattun.unicon",
+      "version": "file:../../Packages/com.mattun.unicon",
       "depth": 0,
-      "source": "embedded",
+      "source": "local",
       "dependencies": {}
     },
     "com.unity.2d.animation": {
