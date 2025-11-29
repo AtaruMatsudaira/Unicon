@@ -1,9 +1,7 @@
 {
-    "name": "DockIconChanger.Editor",
-    "rootNamespace": "DockIconChanger",
-    "references": [
-        "GUID:2d702b2de95148be9141d7366c0766fd"
-    ],
+    "name": "DockIconChanger.Editor.Native",
+    "rootNamespace": "",
+    "references": [],
     "includePlatforms": [
         "Editor"
     ],
