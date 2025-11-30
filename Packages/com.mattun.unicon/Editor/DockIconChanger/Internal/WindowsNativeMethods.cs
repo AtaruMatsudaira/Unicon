@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Drawing;
+using UnityEditor;
 
 namespace DockIconChanger
 {
@@ -38,6 +39,12 @@ namespace DockIconChanger
             uint flags
         );
 
+        [DllImport("DockIconPluginForWindows.dll", CharSet = CharSet.Auto)]
+        private static extern void SetAppId(IntPtr hWnd, string appId);
+        
+        [DllImport("DockIconPluginForWindows.dll", CharSet = CharSet.Auto)]
+        private static extern void ClearAppId(IntPtr hWnd);
+        
         private IntPtr _hIconSmall = IntPtr.Zero;
         private IntPtr _hIconBig = IntPtr.Zero;
 
@@ -56,6 +63,9 @@ namespace DockIconChanger
                 using var bmp = new Bitmap(imagePath);
                 var hIcon = bmp.GetHicon();
                 UpdateIcon(hWnd, hIcon, hIcon);
+                
+                SetAppId(hWnd, CreateAppId(process.Id));
+                
                 return true;
             }
             catch (Exception e)
@@ -69,8 +79,6 @@ namespace DockIconChanger
         {
             try
             {
-                UnityEngine.Debug.Log("DockIconChanger: Setting icon with color overlay is Windows Editor is experimental and may not work as expected.");
-                
                 var process = Process.GetCurrentProcess();
                 var hWnd = process.MainWindowHandle;
 
@@ -93,6 +101,8 @@ namespace DockIconChanger
                 DestroyIcon(hIcon);
                 
                 UpdateIcon(hWnd, hIconNew, hIconNew);
+                
+                SetAppId(hWnd, CreateAppId(process.Id));
 
                 return true;
             }
@@ -116,6 +126,9 @@ namespace DockIconChanger
                 }
                 
                 UpdateIcon(hWnd, IntPtr.Zero, IntPtr.Zero);
+                
+                ClearAppId(hWnd);
+                
                 return true;
             }
             catch (Exception e)
@@ -141,6 +154,7 @@ namespace DockIconChanger
                 DestroyIcon(_hIconBig);
                 _hIconBig = IntPtr.Zero;
             }
+            
 
             _hIconSmall = hIconSmall;
             _hIconBig = hIconBig;
@@ -159,6 +173,11 @@ namespace DockIconChanger
             }
             
             return IntPtr.Zero;
+        }
+
+        private string CreateAppId(int processId)
+        {
+            return $"{PlayerSettings.productName}.{processId}";
         }
     }
 }
