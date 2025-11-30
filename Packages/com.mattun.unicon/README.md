@@ -1,6 +1,6 @@
 # Unicon
 
-English | [日本語](README_ja.md)
+English | [日本語](https://github.com/AtaruMatsudaira/Unicon/blob/main/Packages/com.mattun.unicon/README_ja.md)
 
 Customize Unity Editor dock/taskbar icon on macOS and Windows. Easily distinguish between multiple Unity instances running in parallel.
 
