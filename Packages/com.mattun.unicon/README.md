@@ -1,6 +1,8 @@
 # Unicon
 
-Customize Unity Editor dock icon on macOS. Easily distinguish between multiple Unity instances running in parallel.
+English | [日本語](README_ja.md)
+
+Customize Unity Editor dock/taskbar icon on macOS and Windows. Easily distinguish between multiple Unity instances running in parallel.
 
 ![Unity Version](https://img.shields.io/badge/unity-2020.3%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -15,9 +17,13 @@ Customize Unity Editor dock icon on macOS. Easily distinguish between multiple U
 
 ## Requirements
 
-- **Platform**: macOS 10.13 or later
+- **Platform**:
+  - macOS 10.13 or later
+  - Windows 7 or later
 - **Unity**: 2020.3 or later
-- **Architecture**: x86_64, arm64 (Apple Silicon)
+- **Architecture**:
+  - macOS: x86_64, arm64 (Apple Silicon)
+  - Windows: x86_64
 
 ## Installation
 
@@ -59,10 +65,14 @@ Settings are saved in `UserSettings/DockIconSettings.json` and automatically exc
 
 ## How It Works
 
-This package uses a native macOS plugin (`DockIconPlugin.bundle`) that leverages `NSApplication.applicationIconImage` API to change the dock icon at runtime.
+This package uses native plugins to change the dock/taskbar icon at runtime:
+
+- **macOS**: Uses `DockIconPlugin.bundle` (Swift) that leverages `NSApplication.applicationIconImage` API
+- **Windows**: Uses `DockIconPluginForWindows.dll` (C++) that leverages Windows Shell API to change the taskbar icon
 
 ### Architecture
 
+#### macOS
 ```
 ┌─────────────────┐
 │  Unity Editor   │
@@ -79,6 +89,25 @@ This package uses a native macOS plugin (`DockIconPlugin.bundle`) that leverages
 ┌─────────────────┐
 │   macOS Dock    │
 └─────────────────┘
+```
+
+#### Windows
+```
+┌──────────────────────┐
+│   Unity Editor       │
+│    (C# Scripts)      │
+└──────────┬───────────┘
+           │ P/Invoke
+           ↓
+┌──────────────────────┐
+│ DockIconPluginFor    │
+│      Windows (C++)   │
+└──────────┬───────────┘
+           │ Windows Shell API
+           ↓
+┌──────────────────────┐
+│  Windows Taskbar     │
+└──────────────────────┘
 ```
 
 ## API Reference
@@ -119,13 +148,19 @@ NativeMethods.ResetIcon();
 
 ### Plugin not loading
 
-1. Check if `DockIconPlugin.bundle` exists in `Packages/com.mattun.dockiconchanger/Plugins/Editor/macOS/`
+#### macOS
+1. Check if `DockIconPlugin.bundle` exists in `Packages/com.mattun.unicon/Plugins/Editor/macOS/`
+2. Restart Unity Editor
+3. Check Console for error messages
+
+#### Windows
+1. Check if `DockIconPluginForWindows.dll` exists in `Packages/com.mattun.unicon/Plugins/Editor/Windows/`
 2. Restart Unity Editor
 3. Check Console for error messages
 
 ### Icon not changing
 
-1. This is a macOS-only feature (Windows/Linux not supported)
+1. This feature is currently supported on macOS and Windows only (Linux not supported)
 2. Make sure "Enable Custom Dock Icon" is toggled ON
 3. Click "Apply Current Settings" button in Preferences
 
@@ -134,12 +169,14 @@ NativeMethods.ResetIcon();
 - Only absolute paths are supported (relative paths won't work)
 - Use NSImage-compatible formats: PNG, JPG, ICNS, etc.
 
-## Building the Plugin
+## Building the Plugins
 
-If you need to rebuild the native plugin:
+If you need to rebuild the native plugins:
+
+### macOS Plugin
 
 ```bash
-cd path/to/DockIconPlugin
+cd path/to/Plugins/macOS/DockIconPlugin
 xcodebuild -project DockIconPlugin.xcodeproj \
   -scheme DockIconPlugin \
   -configuration Release \
@@ -150,7 +187,20 @@ xcodebuild -project DockIconPlugin.xcodeproj \
 
 # Copy to package
 cp -r build/Release/DockIconPlugin.bundle \
-  path/to/Packages/com.mattun.dockiconchanger/Plugins/Editor/macOS/
+  path/to/Packages/com.mattun.unicon/Plugins/Editor/macOS/
+```
+
+### Windows Plugin
+
+```bash
+cd path/to/Plugins/Windows/DockIconPlugin
+mkdir build && cd build
+cmake ..
+cmake --build . --config Release
+
+# Copy to package
+cp Release/DockIconPluginForWindows.dll \
+  path/to/Packages/com.mattun.unicon/Plugins/Editor/Windows/
 ```
 
 ## License

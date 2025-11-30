@@ -1,6 +1,8 @@
 # Unicon
 
-macOS上でUnity EditorのDockアイコンをカスタマイズできます。並行して実行している複数のUnityインスタンスを簡単に見分けられます。
+[English](README.md) | 日本語
+
+macOSとWindows上でUnity EditorのDock/タスクバーアイコンをカスタマイズできます。並行して実行している複数のUnityインスタンスを簡単に見分けられます。
 
 ![Unity Version](https://img.shields.io/badge/unity-2020.3%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -15,9 +17,13 @@ macOS上でUnity EditorのDockアイコンをカスタマイズできます。�
 
 ## 動作環境
 
-- **プラットフォーム**: macOS 10.13以降
+- **プラットフォーム**:
+  - macOS 10.13以降
+  - Windows 7以降
 - **Unity**: 2020.3以降
-- **アーキテクチャ**: x86_64, arm64 (Apple Silicon)
+- **アーキテクチャ**:
+  - macOS: x86_64, arm64 (Apple Silicon)
+  - Windows: x86_64
 
 ## インストール
 
@@ -59,10 +65,14 @@ macOS上でUnity EditorのDockアイコンをカスタマイズできます。�
 
 ## 仕組み
 
-このパッケージは、ネイティブmacOSプラグイン（`DockIconPlugin.bundle`）を使用し、`NSApplication.applicationIconImage` APIを活用してランタイムでDockアイコンを変更します。
+このパッケージは、ネイティブプラグインを使用してランタイムでDock/タスクバーアイコンを変更します：
+
+- **macOS**: `DockIconPlugin.bundle`（Swift）を使用し、`NSApplication.applicationIconImage` APIを活用
+- **Windows**: `DockIconPluginForWindows.dll`（C++）を使用し、Windows Shell APIを活用してタスクバーアイコンを変更
 
 ### アーキテクチャ
 
+#### macOS
 ```
 ┌─────────────────┐
 │  Unity Editor   │
@@ -79,6 +89,25 @@ macOS上でUnity EditorのDockアイコンをカスタマイズできます。�
 ┌─────────────────┐
 │   macOS Dock    │
 └─────────────────┘
+```
+
+#### Windows
+```
+┌──────────────────────┐
+│   Unity Editor       │
+│    (C# Scripts)      │
+└──────────┬───────────┘
+           │ P/Invoke
+           ↓
+┌──────────────────────┐
+│ DockIconPluginFor    │
+│      Windows (C++)   │
+└──────────┬───────────┘
+           │ Windows Shell API
+           ↓
+┌──────────────────────┐
+│  Windows Taskbar     │
+└──────────────────────┘
 ```
 
 ## APIリファレンス
@@ -119,13 +148,19 @@ NativeMethods.ResetIcon();
 
 ### プラグインが読み込まれない
 
-1. `DockIconPlugin.bundle` が `Packages/com.mattun.dockiconchanger/Plugins/Editor/macOS/` に存在するか確認
+#### macOS
+1. `DockIconPlugin.bundle` が `Packages/com.mattun.unicon/Plugins/Editor/macOS/` に存在するか確認
+2. Unity Editorを再起動
+3. Consoleでエラーメッセージを確認
+
+#### Windows
+1. `DockIconPluginForWindows.dll` が `Packages/com.mattun.unicon/Plugins/Editor/Windows/` に存在するか確認
 2. Unity Editorを再起動
 3. Consoleでエラーメッセージを確認
 
 ### アイコンが変更されない
 
-1. これはmacOS専用機能です（Windows/Linuxは非対応）
+1. この機能は現在macOSとWindowsでのみサポートされています（Linuxは非対応）
 2. "Enable Custom Dock Icon"がONになっているか確認
 3. Preferencesで"Apply Current Settings"ボタンをクリック
 
@@ -138,8 +173,10 @@ NativeMethods.ResetIcon();
 
 ネイティブプラグインを再ビルドする必要がある場合:
 
+### macOS用プラグイン
+
 ```bash
-cd path/to/DockIconPlugin
+cd path/to/Plugins/macOS/DockIconPlugin
 xcodebuild -project DockIconPlugin.xcodeproj \
   -scheme DockIconPlugin \
   -configuration Release \
@@ -150,7 +187,20 @@ xcodebuild -project DockIconPlugin.xcodeproj \
 
 # パッケージにコピー
 cp -r build/Release/DockIconPlugin.bundle \
-  path/to/Packages/com.mattun.dockiconchanger/Plugins/Editor/macOS/
+  path/to/Packages/com.mattun.unicon/Plugins/Editor/macOS/
+```
+
+### Windows用プラグイン
+
+```bash
+cd path/to/Plugins/Windows/DockIconPlugin
+mkdir build && cd build
+cmake ..
+cmake --build . --config Release
+
+# パッケージにコピー
+cp Release/DockIconPluginForWindows.dll \
+  path/to/Packages/com.mattun.unicon/Plugins/Editor/Windows/
 ```
 
 ## ライセンス

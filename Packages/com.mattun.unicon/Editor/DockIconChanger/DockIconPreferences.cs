@@ -13,7 +13,7 @@ namespace DockIconChanger
             {
                 label = "Dock Icon Changer",
                 guiHandler = DrawPreferencesGUI,
-                keywords = new[] { "dock", "icon", "mac", "macos" }
+                keywords = new[] { "dock", "icon", "mac", "macos", "windows" }
             };
 
             return provider;
@@ -28,7 +28,7 @@ namespace DockIconChanger
             EditorGUILayout.Space(5);
 
             EditorGUILayout.HelpBox(
-                "Customize the Unity Editor dock icon on macOS. " +
+                "Customize the Unity Editor dock icon on macOS and Windows." +
                 "You can either use a custom image or apply a color overlay to the default Unity icon.",
                 MessageType.Info);
 
@@ -162,9 +162,9 @@ namespace DockIconChanger
 
             EditorGUILayout.Space(10);
 
-            // Platform warning for non-macOS
-#if !UNITY_EDITOR_OSX
-            EditorGUILayout.HelpBox("This feature is only available on macOS.", MessageType.Warning);
+            // Platform warning for non-macOS and non-Windows
+#if !UNITY_EDITOR_OSX && !UNITY_EDITOR_WIN
+            EditorGUILayout.HelpBox("This feature is only available on macOS and Windows", MessageType.Warning);
 #endif
         }
 
