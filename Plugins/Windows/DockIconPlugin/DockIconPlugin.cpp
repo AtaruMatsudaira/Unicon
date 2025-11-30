@@ -4,7 +4,6 @@
 #include <propkey.h>
 #include <propsys.h>
 #include <propvarutil.h>
-#include <vector>
 
 #define DLL_EXPORT __declspec(dllexport)
 #define STDCALL __stdcall
