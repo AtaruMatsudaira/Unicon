@@ -9,8 +9,16 @@ namespace DockIconChanger
     internal sealed class WindowsNativeMethods : INativeMethods
     {
         private const uint WM_SETICON = 0x0080;
-        private const int ICON_SMALL = 0;       // 16x16 (ex: Title bar icon)
-        private const int ICON_BIG = 1;         // 32x32~256x256 (ex: Taskbar icon)
+        
+        /// <summary>
+        /// 16x16 (ex: Title bar icon)
+        /// </summary>
+        private const int ICON_SMALL = 0;
+        
+        /// <summary>
+        /// 32x32~256x256 (ex: Taskbar icon)
+        /// </summary>
+        private const int ICON_BIG = 1;
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
