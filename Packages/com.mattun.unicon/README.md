@@ -12,7 +12,7 @@ Customize Unity Editor dock/taskbar icon on macOS and Windows. Easily distinguis
 - **Custom Image Icon**: Use any image file as your dock icon
 - **Color Overlay**: Apply a color overlay to the Unity icon
 - **Auto Color Generation**: Automatically generate a unique color from project name
-- **Auto Apply**: Automatically applies icon on editor startup
+- **Auto Apply**: Automatically applies icon on editor startup and script reload
 - **Preferences UI**: Easy configuration via Edit > Preferences
 
 ## Requirements
