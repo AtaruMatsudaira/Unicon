@@ -1,5 +1,6 @@
 using System.IO;
 using UnityEditor;
+using UnityEditor.Callbacks;
 using UnityEngine;
 
 namespace DockIconChanger
@@ -17,6 +18,7 @@ namespace DockIconChanger
             EditorApplication.delayCall += ApplyDockIcon;
         }
 
+        [DidReloadScripts]
         private static void ApplyDockIcon()
         {
             try
