@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Drawing;
 using UnityEditor;
+using UnityEngine;
 
 namespace DockIconChanger
 {
@@ -187,6 +188,7 @@ namespace DockIconChanger
             }
             
             AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
+            Application.quitting -= OnQuitting;
         }
         
         private void OnQuitting()
@@ -206,7 +208,8 @@ namespace DockIconChanger
             SessionState.EraseString(SmallIconKey);
             SessionState.EraseString(BigIconKey);
             
-            EditorApplication.quitting -= OnQuitting;
+            AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
+            Application.quitting -= OnQuitting;
         }
         
         // P/Invoke declarations

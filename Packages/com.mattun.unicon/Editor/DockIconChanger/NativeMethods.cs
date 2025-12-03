@@ -1,29 +1,17 @@
-using UnityEditor;
 using UnityEngine;
 
 namespace DockIconChanger
 {
-    [InitializeOnLoad]
     internal static class NativeMethods
     {
-        private static readonly INativeMethods s_impl;
-
-        static NativeMethods()
-        {
-            if (EditorApplication.isPlayingOrWillChangePlaymode)
-            {
-                return;
-            }
-            
-            s_impl =
+        private static readonly INativeMethods s_impl =
 #if UNITY_EDITOR_OSX
-                new MacOSNativeMethods();
+            new MacOSNativeMethods();
 #elif UNITY_EDITOR_WIN
-                new WindowsNativeMethods();
+            new WindowsNativeMethods();
 #else
-                new DummyNativeMethods();
+            new DummyNativeMethods();
 #endif 
-        }
         
         public static bool SetIconFromPath(string imagePath)
         {
