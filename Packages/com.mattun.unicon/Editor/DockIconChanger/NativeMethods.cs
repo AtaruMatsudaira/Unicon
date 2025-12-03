@@ -11,7 +11,7 @@ namespace DockIconChanger
             new WindowsNativeMethods();
 #else
             new DummyNativeMethods();
-#endif 
+#endif
         
         public static bool SetIconFromPath(string imagePath)
         {
