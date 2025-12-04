@@ -66,7 +66,29 @@ lipo -info "$UNITY_PLUGIN_DIR/DockIconPlugin.bundle/Contents/MacOS/DockIconPlugi
 # シンボル確認
 echo ""
 echo "[VERIFY] Verifying exported symbols..."
-nm -gU "$UNITY_PLUGIN_DIR/DockIconPlugin.bundle/Contents/MacOS/DockIconPlugin" | grep SetDockIcon
+SYMBOLS=$(nm -gU "$UNITY_PLUGIN_DIR/DockIconPlugin.bundle/Contents/MacOS/DockIconPlugin" | grep -E "(SetDockIcon|ResetDockIcon)")
+echo "$SYMBOLS"
+
+# 必須シンボルの確認
+echo ""
+echo "[VERIFY] Checking required symbols..."
+REQUIRED_SYMBOLS=("SetDockIconFromPath" "SetDockIconWithColorOverlay" "SetDockIconWithText" "SetDockIconUnified" "ResetDockIcon")
+MISSING_SYMBOLS=()
+
+for symbol in "${REQUIRED_SYMBOLS[@]}"; do
+    if echo "$SYMBOLS" | grep -q "_$symbol"; then
+        echo "  ✓ $symbol"
+    else
+        echo "  ✗ $symbol (MISSING)"
+        MISSING_SYMBOLS+=("$symbol")
+    fi
+done
+
+if [ ${#MISSING_SYMBOLS[@]} -ne 0 ]; then
+    echo ""
+    echo "[ERROR] Missing required symbols: ${MISSING_SYMBOLS[*]}"
+    exit 1
+fi
 
 echo ""
 echo "=========================================="
