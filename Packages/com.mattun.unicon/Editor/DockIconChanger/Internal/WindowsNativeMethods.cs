@@ -102,7 +102,7 @@ namespace DockIconChanger
             }
             catch (Exception e)
             {
-                UnityEngine.Debug.LogError($"DockIconChanger: error name:{e.GetType().Name} :{e.Message}");
+                UnityEngine.Debug.LogError($"DockIconChanger: SetIconUnified Error: name: {e.GetType().Name}, message: {e.Message}");
                 return false;
             }
         }
