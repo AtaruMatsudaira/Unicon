@@ -43,71 +43,6 @@ namespace DockIconChanger
             EditorApplication.quitting += OnQuitting;
         }
 
-        public bool SetIconFromPath(string imagePath)
-        {
-            try
-            {
-                var process = Process.GetCurrentProcess();
-                var hWnd = process.MainWindowHandle;
-                if (hWnd == IntPtr.Zero)
-                {
-                    UnityEngine.Debug.LogWarning("DockIconChanger: Unable to retrieve main window handle.");
-                    return false;
-                }
-
-                using var bmp = new Bitmap(imagePath);
-                var hIcon = bmp.GetHicon();
-                UpdateIcon(hWnd, hIcon, hIcon);
-                
-                SetAppId(hWnd, CreateAppId(process.Id));
-                
-                return true;
-            }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.LogError($"DockIconChanger: Error: {e.Message}");
-                return false;
-            }
-        }
-
-        private bool SetIconWithColorOverlay(UnityEngine.Color color)
-        {
-            try
-            {
-                var process = Process.GetCurrentProcess();
-                var hWnd = process.MainWindowHandle;
-
-                if (hWnd == IntPtr.Zero)
-                {
-                    UnityEngine.Debug.LogWarning("DockIconChanger: Unable to retrieve main window handle.");
-                    return false;
-                }
-
-                var exePath = process.MainModule.FileName;
-                var hIcon = ExtractIconFromFile(exePath);
-                if (hIcon == IntPtr.Zero)
-                {
-                    UnityEngine.Debug.LogWarning("DockIconChanger: Unable to extract icon from executable.");
-                    return false;
-                }
-                
-                var hIconNew = WindowsOverlayIconCreator.Create(hIcon, color);
-                
-                DestroyIcon(hIcon);
-                
-                UpdateIcon(hWnd, hIconNew, hIconNew);
-                
-                SetAppId(hWnd, CreateAppId(process.Id));
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.LogError($"DockIconChanger: Failed to set overlay icon: {e.Message}");
-                return false;
-            }
-        }
-
         public bool ResetIcon()
         {
             try
@@ -132,6 +67,77 @@ namespace DockIconChanger
                 return false;
             }
         }
+        
+        public bool SetIconUnified(string imagePath, UnityEngine.Color overlayColor, string text, UnityEngine.Color textColor)
+        {
+            try
+            {
+                using var iconBitmap = string.IsNullOrEmpty(imagePath)
+                    ? CreateColoredIconBitmap(overlayColor)
+                    : CreateFileIconBitmap(imagePath);
+
+                if (iconBitmap == null)
+                {
+                    return false;
+                }
+                
+                if (!string.IsNullOrEmpty(text))
+                {
+                    WindowsBitmapModifier.ModifyBadgeText(iconBitmap, text, textColor);
+                }
+                
+                var process = Process.GetCurrentProcess();
+                var hWnd = process.MainWindowHandle;
+                if (hWnd == IntPtr.Zero)
+                {
+                    UnityEngine.Debug.LogWarning("DockIconChanger: Unable to retrieve main window handle.");
+                    return false;
+                }
+                
+                var hIcon = iconBitmap.GetHicon();
+                UpdateIcon(hWnd, hIcon, hIcon);
+                SetAppId(hWnd, CreateAppId(process.Id));
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogError($"DockIconChanger: error name:{e.GetType().Name} :{e.Message}");
+                return false;
+            }
+        }
+        
+        private Bitmap CreateFileIconBitmap(string imagePath)
+        {
+            return new Bitmap(imagePath);
+        }
+        
+        private Bitmap CreateColoredIconBitmap(UnityEngine.Color color)
+        {
+            var process = Process.GetCurrentProcess();
+            var hWnd = process.MainWindowHandle;
+
+            if (hWnd == IntPtr.Zero)
+            {
+                UnityEngine.Debug.LogWarning("DockIconChanger: Unable to retrieve main window handle.");
+                return null;
+            }
+
+            var exePath = process.MainModule.FileName;
+            var hIcon = ExtractIconFromFile(exePath);
+            if (hIcon == IntPtr.Zero)
+            {
+                UnityEngine.Debug.LogWarning("DockIconChanger: Unable to extract icon from executable.");
+                return null;
+            }
+
+            var bmp = Bitmap.FromHicon(hIcon);
+            WindowsBitmapModifier.ModifyOverlayColor(bmp, color);
+                
+            DestroyIcon(hIcon);
+            
+            return bmp;
+        }
 
         private void UpdateIcon(IntPtr hWnd, IntPtr hIconSmall, IntPtr hIconBig)
         {
@@ -149,7 +155,6 @@ namespace DockIconChanger
                 DestroyIcon(_hIconBig);
                 _hIconBig = IntPtr.Zero;
             }
-            
 
             _hIconSmall = hIconSmall;
             _hIconBig = hIconBig;
@@ -173,21 +178,6 @@ namespace DockIconChanger
         private string CreateAppId(int processId)
         {
             return $"{PlayerSettings.productName}.{processId}";
-        }
-
-        public bool SetIconUnified(string imagePath, UnityEngine.Color overlayColor, string text, UnityEngine.Color textColor)
-        {
-            // Windows implementation doesn't support badge text yet
-            // Apply image or color overlay only (ignore text parameter)
-
-            if (!string.IsNullOrEmpty(imagePath))
-            {
-                return SetIconFromPath(imagePath);
-            }
-            else
-            {
-                return SetIconWithColorOverlay(overlayColor);
-            }
         }
         
         private void OnBeforeAssemblyReload()

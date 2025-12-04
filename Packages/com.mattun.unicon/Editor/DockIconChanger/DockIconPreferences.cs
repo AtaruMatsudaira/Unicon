@@ -135,14 +135,6 @@ namespace DockIconChanger
             // Badge Text Section
             EditorGUILayout.LabelField("Badge Text", EditorStyles.boldLabel);
 
-#if UNITY_EDITOR_WIN
-            EditorGUILayout.HelpBox(
-                "Badge text is not yet supported on Windows. This feature is only available on macOS.",
-                MessageType.Warning);
-
-            EditorGUI.BeginDisabledGroup(true);
-#endif
-
             EditorGUI.BeginChangeCheck();
             string badgeText = EditorGUILayout.TextField("Badge Text", DockIconSettings.BadgeText);
             if (EditorGUI.EndChangeCheck())
@@ -163,10 +155,6 @@ namespace DockIconChanger
                 DockIconSettings.BadgeTextColor = badgeTextColor;
                 DockIconSettings.Save();
             }
-
-#if UNITY_EDITOR_WIN
-            EditorGUI.EndDisabledGroup();
-#endif
 
             EditorGUILayout.Space(10);
 
