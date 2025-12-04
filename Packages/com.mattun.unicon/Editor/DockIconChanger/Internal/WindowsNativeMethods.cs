@@ -48,7 +48,7 @@ namespace DockIconChanger
         private IntPtr _hIconSmall = IntPtr.Zero;
         private IntPtr _hIconBig = IntPtr.Zero;
 
-        public bool SetIconFromPath(string imagePath)
+        private bool SetIconFromPath(string imagePath)
         {
             try
             {
@@ -75,7 +75,7 @@ namespace DockIconChanger
             }
         }
 
-        public bool SetIconWithColorOverlay(UnityEngine.Color color)
+        private bool SetIconWithColorOverlay(UnityEngine.Color color)
         {
             try
             {
@@ -178,6 +178,21 @@ namespace DockIconChanger
         private string CreateAppId(int processId)
         {
             return $"{PlayerSettings.productName}.{processId}";
+        }
+
+        public bool SetIconUnified(string imagePath, UnityEngine.Color overlayColor, string text, UnityEngine.Color textColor)
+        {
+            // Windows implementation doesn't support badge text yet
+            // Apply image or color overlay only (ignore text parameter)
+
+            if (!string.IsNullOrEmpty(imagePath))
+            {
+                return SetIconFromPath(imagePath);
+            }
+            else
+            {
+                return SetIconWithColorOverlay(overlayColor);
+            }
         }
     }
 }

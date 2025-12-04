@@ -28,7 +28,7 @@ namespace DockIconChanger
             EditorGUILayout.Space(5);
 
             EditorGUILayout.HelpBox(
-                "Customize the Unity Editor dock icon on macOS and Windows." +
+                "Customize the Unity Editor dock icon on macOS and Windows. " +
                 "You can either use a custom image or apply a color overlay to the default Unity icon.",
                 MessageType.Info);
 
@@ -81,11 +81,8 @@ namespace DockIconChanger
                     DockIconSettings.Enabled = true;
                     DockIconSettings.Save();
 
-                    // Apply immediately
-                    if (NativeMethods.SetIconFromPath(path))
-                    {
-                        Debug.Log($"DockIconChanger: Applied custom icon: {path}");
-                    }
+                    // Apply immediately with unified API
+                    ApplyCurrentSettings();
                 }
             }
 
@@ -138,6 +135,14 @@ namespace DockIconChanger
             // Badge Text Section
             EditorGUILayout.LabelField("Badge Text", EditorStyles.boldLabel);
 
+#if UNITY_EDITOR_WIN
+            EditorGUILayout.HelpBox(
+                "Badge text is not yet supported on Windows. This feature is only available on macOS.",
+                MessageType.Warning);
+
+            EditorGUI.BeginDisabledGroup(true);
+#endif
+
             EditorGUI.BeginChangeCheck();
             string badgeText = EditorGUILayout.TextField("Badge Text", DockIconSettings.BadgeText);
             if (EditorGUI.EndChangeCheck())
@@ -158,6 +163,10 @@ namespace DockIconChanger
                 DockIconSettings.BadgeTextColor = badgeTextColor;
                 DockIconSettings.Save();
             }
+
+#if UNITY_EDITOR_WIN
+            EditorGUI.EndDisabledGroup();
+#endif
 
             EditorGUILayout.Space(10);
 
@@ -189,11 +198,6 @@ namespace DockIconChanger
             EditorGUI.EndDisabledGroup(); // End disabled group for main settings
 
             EditorGUILayout.Space(10);
-
-            // Platform warning for non-macOS and non-Windows
-#if !UNITY_EDITOR_OSX && !UNITY_EDITOR_WIN
-            EditorGUILayout.HelpBox("This feature is only available on macOS and Windows", MessageType.Warning);
-#endif
         }
 
         private static void ApplyCurrentSettings()

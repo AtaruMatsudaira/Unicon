@@ -13,7 +13,7 @@ namespace DockIconChanger
         public float overlayColorR = 1.0f;
         public float overlayColorG = 1.0f;
         public float overlayColorB = 1.0f;
-        public float overlayColorA = 0.3f;
+        public float overlayColorA = 0f;
         public string badgeText = "";
         public float badgeTextColorR = 1.0f;
         public float badgeTextColorG = 1.0f;
