@@ -31,35 +31,37 @@ namespace DockIconChanger
                     return;
                 }
 
-                // Check if custom image path is set and file exists
+                // Prepare all parameters for unified API
+                string imagePath = "";
                 if (!string.IsNullOrEmpty(DockIconSettings.IconPath) && File.Exists(DockIconSettings.IconPath))
                 {
-                    bool success = NativeMethods.SetIconFromPath(DockIconSettings.IconPath);
-                    if (success)
-                    {
-                        Debug.Log($"DockIconChanger: Applied custom icon from: {DockIconSettings.IconPath}");
-                    }
+                    imagePath = DockIconSettings.IconPath;
+                }
+
+                // Determine overlay color
+                Color overlayColor;
+                if (DockIconSettings.UseAutoColor)
+                {
+                    overlayColor = DockIconSettings.GenerateColorFromProjectName(Application.productName);
                 }
                 else
                 {
-                    // Use color overlay
-                    Color color;
-                    if (DockIconSettings.UseAutoColor)
-                    {
-                        color = DockIconSettings.GenerateColorFromProjectName(Application.productName);
-                        Debug.Log($"DockIconChanger: Auto-generated color for project '{Application.productName}': {color}");
-                    }
-                    else
-                    {
-                        color = DockIconSettings.OverlayColor;
-                        Debug.Log($"DockIconChanger: Using custom overlay color: {color}");
-                    }
+                    overlayColor = DockIconSettings.OverlayColor;
+                }
 
-                    bool success = NativeMethods.SetIconWithColorOverlay(color);
-                    if (success)
-                    {
-                        Debug.Log("DockIconChanger: Applied color overlay to dock icon");
-                    }
+                // Get badge text settings
+                string badgeText = DockIconSettings.BadgeText ?? "";
+                Color textColor = DockIconSettings.BadgeTextColor;
+
+                // Apply all settings with unified API
+                bool success = NativeMethods.SetIconUnified(imagePath, overlayColor, badgeText, textColor);
+                if (success)
+                {
+                    Debug.Log($"DockIconChanger: Applied dock icon customization - " +
+                              $"Image: {(string.IsNullOrEmpty(imagePath) ? "Default" : imagePath)}, " +
+                              $"Overlay: {overlayColor}, " +
+                              $"Badge: {(string.IsNullOrEmpty(badgeText) ? "None" : $"'{badgeText}'")}, " +
+                              $"TextColor: {textColor}");
                 }
             }
             catch (System.Exception ex)

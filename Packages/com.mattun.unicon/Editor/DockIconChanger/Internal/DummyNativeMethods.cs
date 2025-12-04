@@ -21,5 +21,17 @@ namespace DockIconChanger
             Debug.LogWarning("DockIconChanger: This feature is only available on macOS Editor and Windows Editor");
             return false;
         }
+
+        public bool SetIconWithText(string text, Color textColor)
+        {
+            Debug.LogWarning("DockIconChanger: This feature is only available on macOS Editor and Windows Editor");
+            return false;
+        }
+
+        public bool SetIconUnified(string imagePath, Color overlayColor, string text, Color textColor)
+        {
+            Debug.LogWarning("DockIconChanger: This feature is only available on macOS Editor and Windows Editor");
+            return false;
+        }
     }
 }

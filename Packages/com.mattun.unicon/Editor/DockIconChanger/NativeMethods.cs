@@ -27,5 +27,15 @@ namespace DockIconChanger
         {
             return s_impl.ResetIcon();
         }
+
+        public static bool SetIconWithText(string text, Color textColor)
+        {
+            return s_impl.SetIconWithText(text, textColor);
+        }
+
+        public static bool SetIconUnified(string imagePath, Color overlayColor, string text, Color textColor)
+        {
+            return s_impl.SetIconUnified(imagePath, overlayColor, text, textColor);
+        }
     }
 }

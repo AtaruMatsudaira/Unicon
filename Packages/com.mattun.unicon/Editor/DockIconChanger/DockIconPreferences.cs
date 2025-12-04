@@ -133,6 +133,32 @@ namespace DockIconChanger
 
             EditorGUI.EndDisabledGroup();
 
+            EditorGUILayout.Space(15);
+
+            // Badge Text Section
+            EditorGUILayout.LabelField("Badge Text", EditorStyles.boldLabel);
+
+            EditorGUI.BeginChangeCheck();
+            string badgeText = EditorGUILayout.TextField("Badge Text", DockIconSettings.BadgeText);
+            if (EditorGUI.EndChangeCheck())
+            {
+                DockIconSettings.BadgeText = badgeText;
+                DockIconSettings.Save();
+            }
+
+            EditorGUILayout.HelpBox(
+                "Display text on the dock icon (e.g., \"Win\", \"Dev\", \"1\", \"2\"). " +
+                "Recommended: 1-4 characters for optimal visibility.",
+                MessageType.Info);
+
+            EditorGUI.BeginChangeCheck();
+            Color badgeTextColor = EditorGUILayout.ColorField("Badge Text Color", DockIconSettings.BadgeTextColor);
+            if (EditorGUI.EndChangeCheck())
+            {
+                DockIconSettings.BadgeTextColor = badgeTextColor;
+                DockIconSettings.Save();
+            }
+
             EditorGUILayout.Space(10);
 
             // Apply and Reset Buttons
@@ -148,6 +174,8 @@ namespace DockIconChanger
                 DockIconSettings.IconPath = "";
                 DockIconSettings.UseAutoColor = true;
                 DockIconSettings.OverlayColor = new Color(1.0f, 0.5f, 0.0f, 0.3f);
+                DockIconSettings.BadgeText = "";
+                DockIconSettings.BadgeTextColor = Color.white;
                 DockIconSettings.Save();
 
                 if (NativeMethods.ResetIcon())
@@ -172,23 +200,30 @@ namespace DockIconChanger
         {
             DockIconSettings.Load();
 
+            // Prepare all parameters for unified API
+            string imagePath = "";
             if (!string.IsNullOrEmpty(DockIconSettings.IconPath) && File.Exists(DockIconSettings.IconPath))
             {
-                if (NativeMethods.SetIconFromPath(DockIconSettings.IconPath))
-                {
-                    Debug.Log($"DockIconChanger: Applied custom icon: {DockIconSettings.IconPath}");
-                }
+                imagePath = DockIconSettings.IconPath;
             }
-            else
-            {
-                Color color = DockIconSettings.UseAutoColor
-                    ? DockIconSettings.GenerateColorFromProjectName(Application.productName)
-                    : DockIconSettings.OverlayColor;
 
-                if (NativeMethods.SetIconWithColorOverlay(color))
-                {
-                    Debug.Log($"DockIconChanger: Applied color overlay: {color}");
-                }
+            // Determine overlay color
+            Color overlayColor = DockIconSettings.UseAutoColor
+                ? DockIconSettings.GenerateColorFromProjectName(Application.productName)
+                : DockIconSettings.OverlayColor;
+
+            // Get badge text settings
+            string badgeText = DockIconSettings.BadgeText ?? "";
+            Color textColor = DockIconSettings.BadgeTextColor;
+
+            // Apply all settings with unified API
+            if (NativeMethods.SetIconUnified(imagePath, overlayColor, badgeText, textColor))
+            {
+                Debug.Log($"DockIconChanger: Applied dock icon customization - " +
+                          $"Image: {(string.IsNullOrEmpty(imagePath) ? "Default" : imagePath)}, " +
+                          $"Overlay: {overlayColor}, " +
+                          $"Badge: {(string.IsNullOrEmpty(badgeText) ? "None" : $"'{badgeText}'")}, " +
+                          $"TextColor: {textColor}");
             }
         }
     }
