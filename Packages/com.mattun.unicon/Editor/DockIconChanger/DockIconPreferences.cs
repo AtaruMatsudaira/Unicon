@@ -28,7 +28,7 @@ namespace DockIconChanger
             EditorGUILayout.Space(5);
 
             EditorGUILayout.HelpBox(
-                "Customize the Unity Editor dock icon on macOS and Windows." +
+                "Customize the Unity Editor dock icon on macOS and Windows. " +
                 "You can either use a custom image or apply a color overlay to the default Unity icon.",
                 MessageType.Info);
 
@@ -81,11 +81,8 @@ namespace DockIconChanger
                     DockIconSettings.Enabled = true;
                     DockIconSettings.Save();
 
-                    // Apply immediately
-                    if (NativeMethods.SetIconFromPath(path))
-                    {
-                        Debug.Log($"DockIconChanger: Applied custom icon: {path}");
-                    }
+                    // Apply immediately with unified API
+                    ApplyCurrentSettings();
                 }
             }
 
@@ -133,6 +130,44 @@ namespace DockIconChanger
 
             EditorGUI.EndDisabledGroup();
 
+            EditorGUILayout.Space(15);
+
+            // Badge Text Section
+            EditorGUILayout.LabelField("Badge Text", EditorStyles.boldLabel);
+
+#if UNITY_EDITOR_WIN
+            EditorGUILayout.HelpBox(
+                "Badge text is not yet supported on Windows. This feature is only available on macOS.",
+                MessageType.Warning);
+
+            EditorGUI.BeginDisabledGroup(true);
+#endif
+
+            EditorGUI.BeginChangeCheck();
+            string badgeText = EditorGUILayout.TextField("Badge Text", DockIconSettings.BadgeText);
+            if (EditorGUI.EndChangeCheck())
+            {
+                DockIconSettings.BadgeText = badgeText;
+                DockIconSettings.Save();
+            }
+
+            EditorGUILayout.HelpBox(
+                "Display text on the dock icon (e.g., \"Win\", \"Dev\", \"1\", \"2\"). " +
+                "Recommended: 1-4 characters for optimal visibility.",
+                MessageType.Info);
+
+            EditorGUI.BeginChangeCheck();
+            Color badgeTextColor = EditorGUILayout.ColorField("Badge Text Color", DockIconSettings.BadgeTextColor);
+            if (EditorGUI.EndChangeCheck())
+            {
+                DockIconSettings.BadgeTextColor = badgeTextColor;
+                DockIconSettings.Save();
+            }
+
+#if UNITY_EDITOR_WIN
+            EditorGUI.EndDisabledGroup();
+#endif
+
             EditorGUILayout.Space(10);
 
             // Apply and Reset Buttons
@@ -148,6 +183,8 @@ namespace DockIconChanger
                 DockIconSettings.IconPath = "";
                 DockIconSettings.UseAutoColor = true;
                 DockIconSettings.OverlayColor = new Color(1.0f, 0.5f, 0.0f, 0.3f);
+                DockIconSettings.BadgeText = "";
+                DockIconSettings.BadgeTextColor = Color.white;
                 DockIconSettings.Save();
 
                 if (NativeMethods.ResetIcon())
@@ -161,34 +198,36 @@ namespace DockIconChanger
             EditorGUI.EndDisabledGroup(); // End disabled group for main settings
 
             EditorGUILayout.Space(10);
-
-            // Platform warning for non-macOS and non-Windows
-#if !UNITY_EDITOR_OSX && !UNITY_EDITOR_WIN
-            EditorGUILayout.HelpBox("This feature is only available on macOS and Windows", MessageType.Warning);
-#endif
         }
 
         private static void ApplyCurrentSettings()
         {
             DockIconSettings.Load();
 
+            // Prepare all parameters for unified API
+            string imagePath = "";
             if (!string.IsNullOrEmpty(DockIconSettings.IconPath) && File.Exists(DockIconSettings.IconPath))
             {
-                if (NativeMethods.SetIconFromPath(DockIconSettings.IconPath))
-                {
-                    Debug.Log($"DockIconChanger: Applied custom icon: {DockIconSettings.IconPath}");
-                }
+                imagePath = DockIconSettings.IconPath;
             }
-            else
-            {
-                Color color = DockIconSettings.UseAutoColor
-                    ? DockIconSettings.GenerateColorFromProjectName(Application.productName)
-                    : DockIconSettings.OverlayColor;
 
-                if (NativeMethods.SetIconWithColorOverlay(color))
-                {
-                    Debug.Log($"DockIconChanger: Applied color overlay: {color}");
-                }
+            // Determine overlay color
+            Color overlayColor = DockIconSettings.UseAutoColor
+                ? DockIconSettings.GenerateColorFromProjectName(Application.productName)
+                : DockIconSettings.OverlayColor;
+
+            // Get badge text settings
+            string badgeText = DockIconSettings.BadgeText ?? "";
+            Color textColor = DockIconSettings.BadgeTextColor;
+
+            // Apply all settings with unified API
+            if (NativeMethods.SetIconUnified(imagePath, overlayColor, badgeText, textColor))
+            {
+                Debug.Log($"DockIconChanger: Applied dock icon customization - " +
+                          $"Image: {(string.IsNullOrEmpty(imagePath) ? "Default" : imagePath)}, " +
+                          $"Overlay: {overlayColor}, " +
+                          $"Badge: {(string.IsNullOrEmpty(badgeText) ? "None" : $"'{badgeText}'")}, " +
+                          $"TextColor: {textColor}");
             }
         }
     }

@@ -13,7 +13,12 @@ namespace DockIconChanger
         public float overlayColorR = 1.0f;
         public float overlayColorG = 1.0f;
         public float overlayColorB = 1.0f;
-        public float overlayColorA = 0.3f;
+        public float overlayColorA = 0f;
+        public string badgeText = "";
+        public float badgeTextColorR = 1.0f;
+        public float badgeTextColorG = 1.0f;
+        public float badgeTextColorB = 1.0f;
+        public float badgeTextColorA = 1.0f;
     }
 
     internal static class DockIconSettings
@@ -78,6 +83,37 @@ namespace DockIconChanger
                 s_data.overlayColorG = value.g;
                 s_data.overlayColorB = value.b;
                 s_data.overlayColorA = value.a;
+            }
+        }
+
+        public static string BadgeText
+        {
+            get
+            {
+                EnsureLoaded();
+                return s_data.badgeText;
+            }
+            set
+            {
+                EnsureLoaded();
+                s_data.badgeText = value;
+            }
+        }
+
+        public static Color BadgeTextColor
+        {
+            get
+            {
+                EnsureLoaded();
+                return new Color(s_data.badgeTextColorR, s_data.badgeTextColorG, s_data.badgeTextColorB, s_data.badgeTextColorA);
+            }
+            set
+            {
+                EnsureLoaded();
+                s_data.badgeTextColorR = value.r;
+                s_data.badgeTextColorG = value.g;
+                s_data.badgeTextColorB = value.b;
+                s_data.badgeTextColorA = value.a;
             }
         }
 
