@@ -8,14 +8,42 @@ namespace DockIconChanger
     [InitializeOnLoad]
     internal static class DockIconInitializer
     {
+        private static int _frameCount;
+        private static double _lastApplyTime;
+        private const int FrameCheckInterval = 60;
+        private const double ApplyInterval = 1.0;
+
         static DockIconInitializer()
         {
-            // Skip if entering play mode or compiling
-            if (EditorApplication.isPlayingOrWillChangePlaymode)
-                return;
-
-            // Delay call to ensure Unity is fully initialized
+#if UNITY_EDITOR_WIN
             EditorApplication.delayCall += ApplyDockIcon;
+#elif UNITY_EDITOR_OSX
+            // Register periodic update to maintain dock icon
+            // macOS may reset the icon, so we need to re-apply periodically
+            EditorApplication.update += PeriodicApply;
+#endif
+        }
+
+        private static void PeriodicApply()
+        {
+            // Only check time every N frames to reduce overhead
+            _frameCount++;
+            if (_frameCount < FrameCheckInterval)
+            {
+                return;
+            }
+
+            _frameCount = 0;
+
+            // Check if enough time has passed since last application
+            double currentTime = EditorApplication.timeSinceStartup;
+            if (currentTime - _lastApplyTime < ApplyInterval)
+            {
+                return;
+            }
+
+            _lastApplyTime = currentTime;
+            ApplyDockIcon();
         }
 
         [DidReloadScripts]
@@ -54,15 +82,7 @@ namespace DockIconChanger
                 Color textColor = DockIconSettings.BadgeTextColor;
 
                 // Apply all settings with unified API
-                bool success = NativeMethods.SetIconUnified(imagePath, overlayColor, badgeText, textColor);
-                if (success)
-                {
-                    Debug.Log($"DockIconChanger: Applied dock icon customization - " +
-                              $"Image: {(string.IsNullOrEmpty(imagePath) ? "Default" : imagePath)}, " +
-                              $"Overlay: {overlayColor}, " +
-                              $"Badge: {(string.IsNullOrEmpty(badgeText) ? "None" : $"'{badgeText}'")}, " +
-                              $"TextColor: {textColor}");
-                }
+                NativeMethods.SetIconUnified(imagePath, overlayColor, badgeText, textColor);
             }
             catch (System.Exception ex)
             {
