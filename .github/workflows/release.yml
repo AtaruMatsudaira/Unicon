@@ -1,0 +1,62 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g., 1.2.0)'
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate version format
+        run: |
+          if ! [[ "${{ inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Version must be in format X.Y.Z (e.g., 1.2.0)"
+            exit 1
+          fi
+
+      - name: Update package.json version
+        run: |
+          cd Packages/com.mattun.unicon
+          jq '.version = "${{ inputs.version }}"' package.json > package.json.tmp
+          mv package.json.tmp package.json
+          cat package.json
+
+      - name: Commit version update
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add Packages/com.mattun.unicon/package.json
+          git commit -m "Release v${{ inputs.version }}"
+
+      - name: Create and push tag
+        run: |
+          git tag -a "v${{ inputs.version }}" -m "Release v${{ inputs.version }}"
+          git push origin HEAD:${{ github.ref_name }}
+          git push origin "v${{ inputs.version }}"
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ inputs.version }}
+          release_name: Release v${{ inputs.version }}
+          body: |
+            ## Changes in v${{ inputs.version }}
+
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
+          draft: false
+          prerelease: false
