@@ -56,7 +56,6 @@ namespace DockIconChanger
                 }
                 
                 UpdateIcon(hWnd, IntPtr.Zero, IntPtr.Zero);
-                
                 ClearAppId(hWnd);
                 
                 return true;
@@ -124,7 +123,7 @@ namespace DockIconChanger
             }
 
             var exePath = process.MainModule.FileName;
-            var hIcon = ExtractIconFromFile(exePath);
+            var hIcon = ExtractIconFromPath(exePath, 256);
             if (hIcon == IntPtr.Zero)
             {
                 UnityEngine.Debug.LogWarning("DockIconChanger: Unable to extract icon from executable.");
@@ -134,7 +133,7 @@ namespace DockIconChanger
             var bmp = Bitmap.FromHicon(hIcon);
             WindowsBitmapModifier.ModifyOverlayColor(bmp, color);
                 
-            DestroyIcon(hIcon);
+            DeleteIcon(hIcon);
             
             return bmp;
         }
