@@ -3,7 +3,8 @@ project(DockIconPlugin)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_library(DockIconPlugin SHARED DockIconPlugin.cpp)
+add_library(DockIconPlugin SHARED DockIconPlugin.cpp
+)
 
 set_target_properties(DockIconPlugin PROPERTIES
         OUTPUT_NAME "DockIconPluginForWindows"
