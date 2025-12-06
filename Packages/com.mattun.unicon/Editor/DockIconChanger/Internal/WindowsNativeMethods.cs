@@ -10,35 +10,16 @@ namespace DockIconChanger
 {
     internal sealed class WindowsNativeMethods : INativeMethods
     {
-        private const string SmallIconKey = "com.mattun.unicon.windows.smallicon";
-        private const string BigIconKey = "com.mattun.unicon.windows.bigicon";
-        
-        private IntPtr _hIconSmall = IntPtr.Zero;
-        private IntPtr _hIconBig = IntPtr.Zero;
+        private const string IsInitializedPluginKey = "com.mattun.unicon.windows.is_initialized_plugin";
 
+        private static bool IsInitializedPlugin
+        {
+            get => SessionState.GetBool(IsInitializedPluginKey, false);
+            set => SessionState.SetBool(IsInitializedPluginKey, value);
+        }
+        
         public WindowsNativeMethods()
         {
-            var smallIconPtrStr = SessionState.GetString(SmallIconKey, string.Empty);
-            if (!string.IsNullOrEmpty(smallIconPtrStr))
-            {
-                if (long.TryParse(smallIconPtrStr, out var ptrValue))
-                {
-                    _hIconSmall = new IntPtr(ptrValue);
-                }
-            }
-            
-            var bigIconPtrStr = SessionState.GetString(BigIconKey, string.Empty);
-            if (!string.IsNullOrEmpty(bigIconPtrStr))
-            {
-                if (long.TryParse(bigIconPtrStr, out var ptrValue))
-                {
-                    _hIconBig = new IntPtr(ptrValue);
-                }
-            }
-            
-            SessionState.EraseString(SmallIconKey);
-            SessionState.EraseString(BigIconKey);
-            
             AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
             EditorApplication.quitting += OnQuitting;
         }
@@ -47,17 +28,7 @@ namespace DockIconChanger
         {
             try
             {
-                var process = Process.GetCurrentProcess();
-                var hWnd = process.MainWindowHandle;
-                if (hWnd == IntPtr.Zero)
-                {
-                    UnityEngine.Debug.LogWarning("DockIconChanger: Unable to retrieve current icon.");
-                    return false;
-                }
-                
-                UpdateIcon(hWnd, IntPtr.Zero, IntPtr.Zero);
-                ClearAppId(hWnd);
-                
+                DestroyIfNeeded();
                 return true;
             }
             catch (Exception e)
@@ -85,17 +56,8 @@ namespace DockIconChanger
                     WindowsBitmapModifier.ModifyBadgeText(iconBitmap, text, textColor);
                 }
                 
-                var process = Process.GetCurrentProcess();
-                var hWnd = process.MainWindowHandle;
-                if (hWnd == IntPtr.Zero)
-                {
-                    UnityEngine.Debug.LogWarning("DockIconChanger: Unable to retrieve main window handle.");
-                    return false;
-                }
-                
                 var hIcon = iconBitmap.GetHicon();
-                UpdateIcon(hWnd, hIcon, hIcon);
-                SetAppId(hWnd, CreateAppId(process.Id));
+                UpdateIcon(hIcon, hIcon);
 
                 return true;
             }
@@ -106,22 +68,42 @@ namespace DockIconChanger
             }
         }
         
-        private Bitmap CreateFileIconBitmap(string imagePath)
+        private static void InitializeIfNeeded()
+        {
+            if (IsInitializedPlugin)
+            {
+                return;
+            }
+            
+            InitializeDockIconPlugin();
+            IsInitializedPlugin = true;
+        }
+        
+        private static void DestroyIfNeeded()
+        {
+            if (!IsInitializedPlugin)
+            {
+                return;
+            }
+            
+            DestroyDockIconPlugin();
+            IsInitializedPlugin = false;
+        }
+        
+        private static Bitmap CreateFileIconBitmap(string imagePath)
         {
             return new Bitmap(imagePath);
         }
         
-        private Bitmap CreateColoredIconBitmap(UnityEngine.Color color)
+        private static Bitmap CreateColoredIconBitmap(UnityEngine.Color color)
         {
             var process = Process.GetCurrentProcess();
-            var hWnd = process.MainWindowHandle;
-
-            if (hWnd == IntPtr.Zero)
+            if (process.MainModule == null)
             {
-                UnityEngine.Debug.LogWarning("DockIconChanger: Unable to retrieve main window handle.");
+                UnityEngine.Debug.LogWarning("DockIconChanger: Unable to get current process information.");
                 return null;
             }
-
+            
             var exePath = process.MainModule.FileName;
             var hIcon = ExtractIconFromPath(exePath, 256);
             if (hIcon == IntPtr.Zero)
@@ -138,87 +120,54 @@ namespace DockIconChanger
             return bmp;
         }
 
-        private void UpdateIcon(IntPtr hWnd, IntPtr hIconSmall, IntPtr hIconBig)
+        private static void UpdateIcon(IntPtr hIconSmall, IntPtr hIconBig)
         {
-            SetIcon(hWnd, hIconSmall, hIconBig);
+            InitializeIfNeeded();
             
-            if (_hIconSmall != IntPtr.Zero)
-            {
-                DeleteIcon(_hIconSmall);
-                _hIconSmall = IntPtr.Zero;
-            }
+            var processId = Process.GetCurrentProcess().Id;
+            var appId = CreateAppId(processId);
             
-            if (_hIconBig != IntPtr.Zero)
-            {
-                DeleteIcon(_hIconBig);
-                _hIconBig = IntPtr.Zero;
-            }
-
-            _hIconSmall = hIconSmall;
-            _hIconBig = hIconBig;
+            ApplyToProcessWindows(processId, appId, hIconSmall, hIconBig);
         }
 
-        private string CreateAppId(int processId)
+        private static string CreateAppId(int processId)
         {
             return $"{PlayerSettings.productName}.{processId}";
         }
         
-        private void OnBeforeAssemblyReload()
+        private static void OnBeforeAssemblyReload()
         {
-            if (_hIconSmall != IntPtr.Zero)
-            {
-                SessionState.SetString(SmallIconKey, _hIconSmall.ToInt64().ToString());
-            }
-
-            if (_hIconBig != IntPtr.Zero)
-            {
-                SessionState.SetString(BigIconKey, _hIconBig.ToInt64().ToString());
-            }
-            
             AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
-            Application.quitting -= OnQuitting;
+            EditorApplication.quitting -= OnQuitting;
         }
         
-        private void OnQuitting()
+        private static void OnQuitting()
         {
-            if (_hIconSmall != IntPtr.Zero)
-            {
-                DeleteIcon(_hIconSmall);
-                _hIconSmall = IntPtr.Zero;
-            }
-
-            if (_hIconBig != IntPtr.Zero)
-            {
-                DeleteIcon(_hIconBig);
-                _hIconBig = IntPtr.Zero;
-            }
-            
-            SessionState.EraseString(SmallIconKey);
-            SessionState.EraseString(BigIconKey);
+            DestroyIfNeeded();
             
             AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
-            Application.quitting -= OnQuitting;
+            EditorApplication.quitting -= OnQuitting;
         }
         
         #region P/Invoke Declarations
 
         private const string DllName = "DockIconPluginForWindows.dll";
         
-        [DllImport(DllName, CharSet = CharSet.Auto)]
-        private static extern void SetIcon(IntPtr hWnd, IntPtr hSmallIcon, IntPtr hBigIcon);
-
-        [DllImport(DllName, CharSet = CharSet.Auto)]
+        [DllImport(DllName, CharSet = CharSet.Unicode)]
+        private static extern IntPtr ExtractIconFromPath(string filePath, int size);
+        
+        [DllImport(DllName, CharSet = CharSet.Unicode)]
+        private static extern void ApplyToProcessWindows(int processId, string appId, IntPtr hIconSmall, IntPtr hIconBig);
+        
+        [DllImport(DllName, CharSet = CharSet.Unicode)]
         private static extern void DeleteIcon(IntPtr hIcon);
 
-        [DllImport(DllName, CharSet = CharSet.Auto)]
-        private static extern void SetAppId(IntPtr hWnd, string appId);
+        [DllImport(DllName, CharSet = CharSet.Unicode)]
+        private static extern void InitializeDockIconPlugin();
         
-        [DllImport(DllName, CharSet = CharSet.Auto)]
-        private static extern void ClearAppId(IntPtr hWnd);
+        [DllImport(DllName, CharSet = CharSet.Unicode)]
+        private static extern void DestroyDockIconPlugin();
         
-        [DllImport(DllName, CharSet = CharSet.Auto)]
-        private static extern IntPtr ExtractIconFromPath(string filePath, int size);
-
         #endregion
     }
 }
