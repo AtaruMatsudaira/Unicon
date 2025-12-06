@@ -31,7 +31,7 @@ Customize Unity Editor dock/taskbar icon on macOS and Windows. Easily distinguis
 
 1. Open **Window > Package Manager**
 2. Click **+** button and select **Add package from git URL...**
-3. Enter: `https://github.com/mattun/Unicon.git?path=Packages/com.mattun.unicon`
+3. Enter: `https://github.com/AtaruMatsudaira/Unicon.git?path=Packages/com.mattun.unicon`
 
 ### Via manifest.json
 
@@ -40,7 +40,7 @@ Add the following to your `Packages/manifest.json`:
 ```json
 {
   "dependencies": {
-    "com.mattun.unicon": "https://github.com/mattun/Unicon.git?path=Packages/com.mattun.unicon"
+    "com.mattun.unicon": "https://github.com/AtaruMatsudaira/Unicon.git?path=Packages/com.mattun.unicon"
   }
 }
 ```
