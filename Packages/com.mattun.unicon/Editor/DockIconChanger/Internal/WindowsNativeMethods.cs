@@ -141,38 +141,22 @@ namespace DockIconChanger
 
         private void UpdateIcon(IntPtr hWnd, IntPtr hIconSmall, IntPtr hIconBig)
         {
-            SendMessage(hWnd, WM_SETICON, new IntPtr(ICON_SMALL), hIconSmall);
-            SendMessage(hWnd, WM_SETICON, new IntPtr(ICON_BIG), hIconBig);
+            SetIcon(hWnd, hIconSmall, hIconBig);
             
             if (_hIconSmall != IntPtr.Zero)
             {
-                DestroyIcon(_hIconSmall);
+                DeleteIcon(_hIconSmall);
                 _hIconSmall = IntPtr.Zero;
             }
             
             if (_hIconBig != IntPtr.Zero)
             {
-                DestroyIcon(_hIconBig);
+                DeleteIcon(_hIconBig);
                 _hIconBig = IntPtr.Zero;
             }
 
             _hIconSmall = hIconSmall;
             _hIconBig = hIconBig;
-        }
-        
-        private IntPtr ExtractIconFromFile(string filePath)
-        {
-            const int size = 256;
-            var hIcons = new IntPtr[1];
-            var iconIds = new IntPtr[1];
-            
-            var count = PrivateExtractIcons(filePath, 0, size, size, hIcons, iconIds, 1, 0);
-            if (count > 0 && hIcons[0] != IntPtr.Zero)
-            {
-                return hIcons[0];
-            }
-            
-            return IntPtr.Zero;
         }
 
         private string CreateAppId(int processId)
@@ -200,13 +184,13 @@ namespace DockIconChanger
         {
             if (_hIconSmall != IntPtr.Zero)
             {
-                DestroyIcon(_hIconSmall);
+                DeleteIcon(_hIconSmall);
                 _hIconSmall = IntPtr.Zero;
             }
 
             if (_hIconBig != IntPtr.Zero)
             {
-                DestroyIcon(_hIconBig);
+                DeleteIcon(_hIconBig);
                 _hIconBig = IntPtr.Zero;
             }
             
@@ -219,41 +203,22 @@ namespace DockIconChanger
         
         // P/Invoke declarations
         
-        private const uint WM_SETICON = 0x0080;
+        private const string DllName = "DockIconPluginForWindows.dll";
         
-        /// <summary>
-        /// 16x16 (ex: Title bar icon)
-        /// </summary>
-        private const int ICON_SMALL = 0;
-        
-        /// <summary>
-        /// 32x32~256x256 (ex: Taskbar icon)
-        /// </summary>
-        private const int ICON_BIG = 1;
+        [DllImport(DllName, CharSet = CharSet.Auto)]
+        private static extern void SetIcon(IntPtr hWnd, IntPtr hSmallIcon, IntPtr hBigIcon);
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
-        
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool DestroyIcon(IntPtr hIcon);
+        [DllImport(DllName, CharSet = CharSet.Auto)]
+        private static extern void DeleteIcon(IntPtr hIcon);
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern uint PrivateExtractIcons(
-            string lpszFile, 
-            int nIconIndex, 
-            int cxIcon, 
-            int cyIcon, 
-            IntPtr[] phicon, 
-            IntPtr[] piconid, 
-            uint nIcons, 
-            uint flags
-        );
-
-        [DllImport("DockIconPluginForWindows.dll", CharSet = CharSet.Auto)]
+        [DllImport(DllName, CharSet = CharSet.Auto)]
         private static extern void SetAppId(IntPtr hWnd, string appId);
         
-        [DllImport("DockIconPluginForWindows.dll", CharSet = CharSet.Auto)]
+        [DllImport(DllName, CharSet = CharSet.Auto)]
         private static extern void ClearAppId(IntPtr hWnd);
+        
+        [DllImport(DllName, CharSet = CharSet.Auto)]
+        private static extern IntPtr ExtractIconFromPath(string filePath, int size);
     }
 }
 #endif
