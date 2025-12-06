@@ -200,8 +200,8 @@ namespace DockIconChanger
             Application.quitting -= OnQuitting;
         }
         
-        // P/Invoke declarations
-        
+        #region P/Invoke Declarations
+
         private const string DllName = "DockIconPluginForWindows.dll";
         
         [DllImport(DllName, CharSet = CharSet.Auto)]
@@ -218,6 +218,8 @@ namespace DockIconChanger
         
         [DllImport(DllName, CharSet = CharSet.Auto)]
         private static extern IntPtr ExtractIconFromPath(string filePath, int size);
+
+        #endregion
     }
 }
 #endif
