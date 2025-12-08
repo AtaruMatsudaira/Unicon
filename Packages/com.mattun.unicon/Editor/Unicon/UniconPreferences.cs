@@ -2,16 +2,16 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace DockIconChanger
+namespace Unicon
 {
-    internal static class DockIconPreferences
+    internal static class UniconPreferences
     {
         [SettingsProvider]
         public static SettingsProvider CreateProvider()
         {
-            var provider = new SettingsProvider("Preferences/Dock Icon Changer", SettingsScope.User)
+            var provider = new SettingsProvider("Preferences/Unicon", SettingsScope.User)
             {
-                label = "Dock Icon Changer",
+                label = "Unicon",
                 guiHandler = DrawPreferencesGUI,
                 keywords = new[] { "dock", "icon", "mac", "macos", "windows" }
             };
@@ -21,10 +21,10 @@ namespace DockIconChanger
 
         private static void DrawPreferencesGUI(string searchContext)
         {
-            DockIconSettings.Load();
+            UniconSettings.Load();
 
             EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField("Dock Icon Settings", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Unicon Settings", EditorStyles.boldLabel);
             EditorGUILayout.Space(5);
 
             EditorGUILayout.HelpBox(
@@ -36,11 +36,11 @@ namespace DockIconChanger
 
             // Enable/Disable Toggle
             EditorGUI.BeginChangeCheck();
-            bool enabled = EditorGUILayout.Toggle("Enable Custom Dock Icon", DockIconSettings.Enabled);
+            bool enabled = EditorGUILayout.Toggle("Enable Custom Dock Icon", UniconSettings.Enabled);
             if (EditorGUI.EndChangeCheck())
             {
-                DockIconSettings.Enabled = enabled;
-                DockIconSettings.Save();
+                UniconSettings.Enabled = enabled;
+                UniconSettings.Save();
 
                 if (enabled)
                 {
@@ -51,7 +51,7 @@ namespace DockIconChanger
                 {
                     // Reset to default when disabled
                     NativeMethods.ResetIcon();
-                    Debug.Log("DockIconChanger: Disabled - Reset to default Unity icon");
+                    Debug.Log("Unicon: Disabled - Reset to default Unity icon");
                 }
             }
 
@@ -63,7 +63,7 @@ namespace DockIconChanger
             EditorGUILayout.LabelField("Custom Image", EditorStyles.boldLabel);
             EditorGUILayout.BeginHorizontal();
 
-            string currentPath = DockIconSettings.IconPath;
+            string currentPath = UniconSettings.IconPath;
             string displayPath = string.IsNullOrEmpty(currentPath) ? "No image selected" : Path.GetFileName(currentPath);
             EditorGUILayout.TextField("Icon Path", displayPath);
 
@@ -77,9 +77,9 @@ namespace DockIconChanger
 
                 if (!string.IsNullOrEmpty(path))
                 {
-                    DockIconSettings.IconPath = path;
-                    DockIconSettings.Enabled = true;
-                    DockIconSettings.Save();
+                    UniconSettings.IconPath = path;
+                    UniconSettings.Enabled = true;
+                    UniconSettings.Save();
 
                     // Apply immediately with unified API
                     ApplyCurrentSettings();
@@ -88,8 +88,8 @@ namespace DockIconChanger
 
             if (!string.IsNullOrEmpty(currentPath) && GUILayout.Button("Clear", GUILayout.Width(60)))
             {
-                DockIconSettings.IconPath = "";
-                DockIconSettings.Save();
+                UniconSettings.IconPath = "";
+                UniconSettings.Save();
             }
 
             EditorGUILayout.EndHorizontal();
@@ -105,11 +105,11 @@ namespace DockIconChanger
             EditorGUILayout.LabelField("Color Overlay", EditorStyles.boldLabel);
             EditorGUI.BeginChangeCheck();
 
-            bool useAutoColor = EditorGUILayout.Toggle("Use Auto Color", DockIconSettings.UseAutoColor);
+            bool useAutoColor = EditorGUILayout.Toggle("Use Auto Color", UniconSettings.UseAutoColor);
             if (EditorGUI.EndChangeCheck())
             {
-                DockIconSettings.UseAutoColor = useAutoColor;
-                DockIconSettings.Save();
+                UniconSettings.UseAutoColor = useAutoColor;
+                UniconSettings.Save();
             }
 
             EditorGUILayout.HelpBox(
@@ -121,11 +121,11 @@ namespace DockIconChanger
             EditorGUI.BeginDisabledGroup(useAutoColor);
             EditorGUI.BeginChangeCheck();
 
-            Color overlayColor = EditorGUILayout.ColorField("Overlay Color", DockIconSettings.OverlayColor);
+            Color overlayColor = EditorGUILayout.ColorField("Overlay Color", UniconSettings.OverlayColor);
             if (EditorGUI.EndChangeCheck())
             {
-                DockIconSettings.OverlayColor = overlayColor;
-                DockIconSettings.Save();
+                UniconSettings.OverlayColor = overlayColor;
+                UniconSettings.Save();
             }
 
             EditorGUI.EndDisabledGroup();
@@ -136,11 +136,11 @@ namespace DockIconChanger
             EditorGUILayout.LabelField("Badge Text", EditorStyles.boldLabel);
 
             EditorGUI.BeginChangeCheck();
-            string badgeText = EditorGUILayout.TextField("Badge Text", DockIconSettings.BadgeText);
+            string badgeText = EditorGUILayout.TextField("Badge Text", UniconSettings.BadgeText);
             if (EditorGUI.EndChangeCheck())
             {
-                DockIconSettings.BadgeText = badgeText;
-                DockIconSettings.Save();
+                UniconSettings.BadgeText = badgeText;
+                UniconSettings.Save();
             }
 
             EditorGUILayout.HelpBox(
@@ -149,11 +149,11 @@ namespace DockIconChanger
                 MessageType.Info);
 
             EditorGUI.BeginChangeCheck();
-            Color badgeTextColor = EditorGUILayout.ColorField("Badge Text Color", DockIconSettings.BadgeTextColor);
+            Color badgeTextColor = EditorGUILayout.ColorField("Badge Text Color", UniconSettings.BadgeTextColor);
             if (EditorGUI.EndChangeCheck())
             {
-                DockIconSettings.BadgeTextColor = badgeTextColor;
-                DockIconSettings.Save();
+                UniconSettings.BadgeTextColor = badgeTextColor;
+                UniconSettings.Save();
             }
 
             EditorGUILayout.Space(10);
@@ -168,16 +168,16 @@ namespace DockIconChanger
 
             if (GUILayout.Button("Reset to Default"))
             {
-                DockIconSettings.IconPath = "";
-                DockIconSettings.UseAutoColor = true;
-                DockIconSettings.OverlayColor = new Color(1.0f, 0.5f, 0.0f, 0.3f);
-                DockIconSettings.BadgeText = "";
-                DockIconSettings.BadgeTextColor = Color.white;
-                DockIconSettings.Save();
+                UniconSettings.IconPath = "";
+                UniconSettings.UseAutoColor = true;
+                UniconSettings.OverlayColor = new Color(1.0f, 0.5f, 0.0f, 0.3f);
+                UniconSettings.BadgeText = "";
+                UniconSettings.BadgeTextColor = Color.white;
+                UniconSettings.Save();
 
                 if (NativeMethods.ResetIcon())
                 {
-                    Debug.Log("DockIconChanger: Reset to default Unity icon");
+                    Debug.Log("Unicon: Reset to default Unity icon");
                 }
             }
 
@@ -190,28 +190,28 @@ namespace DockIconChanger
 
         private static void ApplyCurrentSettings()
         {
-            DockIconSettings.Load();
+            UniconSettings.Load();
 
             // Prepare all parameters for unified API
             string imagePath = "";
-            if (!string.IsNullOrEmpty(DockIconSettings.IconPath) && File.Exists(DockIconSettings.IconPath))
+            if (!string.IsNullOrEmpty(UniconSettings.IconPath) && File.Exists(UniconSettings.IconPath))
             {
-                imagePath = DockIconSettings.IconPath;
+                imagePath = UniconSettings.IconPath;
             }
 
             // Determine overlay color
-            Color overlayColor = DockIconSettings.UseAutoColor
-                ? DockIconSettings.GenerateColorFromProjectName(Application.productName)
-                : DockIconSettings.OverlayColor;
+            Color overlayColor = UniconSettings.UseAutoColor
+                ? UniconSettings.GenerateColorFromProjectName(Application.productName)
+                : UniconSettings.OverlayColor;
 
             // Get badge text settings
-            string badgeText = DockIconSettings.BadgeText ?? "";
-            Color textColor = DockIconSettings.BadgeTextColor;
+            string badgeText = UniconSettings.BadgeText ?? "";
+            Color textColor = UniconSettings.BadgeTextColor;
 
             // Apply all settings with unified API
             if (NativeMethods.SetIconUnified(imagePath, overlayColor, badgeText, textColor))
             {
-                Debug.Log($"DockIconChanger: Applied dock icon customization - " +
+                Debug.Log($"Unicon: Applied dock icon customization - " +
                           $"Image: {(string.IsNullOrEmpty(imagePath) ? "Default" : imagePath)}, " +
                           $"Overlay: {overlayColor}, " +
                           $"Badge: {(string.IsNullOrEmpty(badgeText) ? "None" : $"'{badgeText}'")}, " +

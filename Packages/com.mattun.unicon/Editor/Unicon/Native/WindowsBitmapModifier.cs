@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using UnityEngine;
 
-namespace DockIconChanger
+namespace Unicon
 {
     public static class WindowsBitmapModifier
     {

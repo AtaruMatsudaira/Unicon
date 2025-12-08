@@ -3,7 +3,7 @@ using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
-namespace DockIconChanger
+namespace Unicon
 {
     internal sealed class MacOSNativeMethods : INativeMethods
     {
@@ -29,12 +29,12 @@ namespace DockIconChanger
             }
             catch (DllNotFoundException ex)
             {
-                Debug.LogWarning($"DockIconChanger: Plugin not found. Make sure DockIconPlugin.bundle is in Assets/Plugins/Editor/macOS/. Error: {ex.Message}");
+                Debug.LogWarning($"Unicon: Plugin not found. Make sure DockIconPlugin.bundle is in Assets/Plugins/Editor/macOS/. Error: {ex.Message}");
                 return false;
             }
             catch (Exception ex)
             {
-                Debug.LogError($"DockIconChanger: Failed to reset dock icon: {ex.Message}");
+                Debug.LogError($"Unicon: Failed to reset dock icon: {ex.Message}");
                 return false;
             }
         }
@@ -53,12 +53,12 @@ namespace DockIconChanger
             }
             catch (DllNotFoundException ex)
             {
-                Debug.LogWarning($"DockIconChanger: Plugin not found. Make sure DockIconPlugin.bundle is in Plugins/Editor/macOS/. Error: {ex.Message}");
+                Debug.LogWarning($"Unicon: Plugin not found. Make sure DockIconPlugin.bundle is in Plugins/Editor/macOS/. Error: {ex.Message}");
                 return false;
             }
             catch (Exception ex)
             {
-                Debug.LogError($"DockIconChanger: Failed to set unified dock icon: {ex.Message}");
+                Debug.LogError($"Unicon: Failed to set unified dock icon: {ex.Message}");
                 return false;
             }
         }
