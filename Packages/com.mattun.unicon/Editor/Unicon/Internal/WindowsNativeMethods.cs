@@ -6,7 +6,7 @@ using System.Drawing;
 using UnityEditor;
 using UnityEngine;
 
-namespace DockIconChanger
+namespace Unicon
 {
     internal sealed class WindowsNativeMethods : INativeMethods
     {
@@ -51,7 +51,7 @@ namespace DockIconChanger
                 var hWnd = process.MainWindowHandle;
                 if (hWnd == IntPtr.Zero)
                 {
-                    UnityEngine.Debug.LogWarning("DockIconChanger: Unable to retrieve current icon.");
+                    UnityEngine.Debug.LogWarning("Unicon: Unable to retrieve current icon.");
                     return false;
                 }
                 
@@ -63,7 +63,7 @@ namespace DockIconChanger
             }
             catch (Exception e)
             {
-                UnityEngine.Debug.LogError($"DockIconChanger: Reset error: {e.Message}");
+                UnityEngine.Debug.LogError($"Unicon: Reset error: {e.Message}");
                 return false;
             }
         }
@@ -90,7 +90,7 @@ namespace DockIconChanger
                 var hWnd = process.MainWindowHandle;
                 if (hWnd == IntPtr.Zero)
                 {
-                    UnityEngine.Debug.LogWarning("DockIconChanger: Unable to retrieve main window handle.");
+                    UnityEngine.Debug.LogWarning("Unicon: Unable to retrieve main window handle.");
                     return false;
                 }
                 
@@ -102,7 +102,7 @@ namespace DockIconChanger
             }
             catch (Exception e)
             {
-                UnityEngine.Debug.LogError($"DockIconChanger: SetIconUnified Error: name: {e.GetType().Name}, message: {e.Message}");
+                UnityEngine.Debug.LogError($"Unicon: SetIconUnified Error: name: {e.GetType().Name}, message: {e.Message}");
                 return false;
             }
         }
@@ -119,7 +119,7 @@ namespace DockIconChanger
 
             if (hWnd == IntPtr.Zero)
             {
-                UnityEngine.Debug.LogWarning("DockIconChanger: Unable to retrieve main window handle.");
+                UnityEngine.Debug.LogWarning("Unicon: Unable to retrieve main window handle.");
                 return null;
             }
 
@@ -127,7 +127,7 @@ namespace DockIconChanger
             var hIcon = ExtractIconFromFile(exePath);
             if (hIcon == IntPtr.Zero)
             {
-                UnityEngine.Debug.LogWarning("DockIconChanger: Unable to extract icon from executable.");
+                UnityEngine.Debug.LogWarning("Unicon: Unable to extract icon from executable.");
                 return null;
             }
 

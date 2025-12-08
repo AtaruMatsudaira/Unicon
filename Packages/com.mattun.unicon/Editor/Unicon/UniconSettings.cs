@@ -2,10 +2,10 @@ using System;
 using System.IO;
 using UnityEngine;
 
-namespace DockIconChanger
+namespace Unicon
 {
     [Serializable]
-    internal class DockIconSettingsData
+    internal class UniconSettingsData
     {
         public bool enabled = false;
         public string iconPath = "";
@@ -21,10 +21,10 @@ namespace DockIconChanger
         public float badgeTextColorA = 1.0f;
     }
 
-    internal static class DockIconSettings
+    internal static class UniconSettings
     {
         private const string kSettingsPath = "UserSettings/DockIconSettings.json";
-        private static DockIconSettingsData s_data;
+        private static UniconSettingsData s_data;
         private static bool s_loaded = false;
 
         public static bool Enabled
@@ -132,17 +132,17 @@ namespace DockIconChanger
                 try
                 {
                     string json = File.ReadAllText(kSettingsPath);
-                    s_data = JsonUtility.FromJson<DockIconSettingsData>(json);
+                    s_data = JsonUtility.FromJson<UniconSettingsData>(json);
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning($"Failed to load DockIconSettings: {ex.Message}. Using defaults.");
-                    s_data = new DockIconSettingsData();
+                    Debug.LogWarning($"Failed to load UniconSettings: {ex.Message}. Using defaults.");
+                    s_data = new UniconSettingsData();
                 }
             }
             else
             {
-                s_data = new DockIconSettingsData();
+                s_data = new UniconSettingsData();
             }
 
             s_loaded = true;
@@ -166,7 +166,7 @@ namespace DockIconChanger
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to save DockIconSettings: {ex.Message}");
+                Debug.LogError($"Failed to save UniconSettings: {ex.Message}");
             }
         }
 

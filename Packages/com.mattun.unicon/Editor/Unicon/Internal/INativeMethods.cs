@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace DockIconChanger
+namespace Unicon
 {
     internal interface INativeMethods
     {
