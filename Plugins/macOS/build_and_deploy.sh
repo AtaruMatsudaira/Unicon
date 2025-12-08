@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# DockIconPlugin のビルドと配置を自動化するスクリプト
+# UniconPlugin のビルドと配置を自動化するスクリプト
 # Usage: ./build_and_deploy.sh
 
 set -e
@@ -12,15 +12,15 @@ UNITY_PLUGIN_DIR="$PROJECT_ROOT/Packages/com.mattun.unicon/Plugins/Editor/macOS"
 BUILD_DIR="$HOME/Library/Developer/Xcode/DerivedData"
 
 echo "=========================================="
-echo "DockIconPlugin Build & Deploy"
+echo "UniconPlugin Build & Deploy"
 echo "=========================================="
 echo ""
 
 # ビルド
 echo "[BUILD] Building Swift plugin (Universal Binary: arm64 + x86_64)..."
 cd "$PLUGIN_DIR"
-xcodebuild -project DockIconPlugin.xcodeproj \
-    -scheme DockIconPlugin \
+xcodebuild -project UniconPlugin.xcodeproj \
+    -scheme UniconPlugin \
     -configuration Release \
     -arch arm64 \
     -arch x86_64 \
@@ -36,7 +36,7 @@ echo "[SUCCESS] Build succeeded!"
 echo ""
 
 # ビルド成果物のパスを探す
-BUNDLE_PATH=$(find "$BUILD_DIR" -name "DockIconPlugin.bundle" -path "*/Release/DockIconPlugin.bundle" | head -n 1)
+BUNDLE_PATH=$(find "$BUILD_DIR" -name "UniconPlugin.bundle" -path "*/Release/UniconPlugin.bundle" | head -n 1)
 
 if [ -z "$BUNDLE_PATH" ]; then
     echo "[ERROR] Could not find built bundle!"
@@ -48,7 +48,7 @@ echo ""
 
 # Unityプロジェクトに配置
 echo "[DEPLOY] Deploying to Unity project..."
-rm -rf "$UNITY_PLUGIN_DIR/DockIconPlugin.bundle"
+rm -rf "$UNITY_PLUGIN_DIR/UniconPlugin.bundle"
 cp -R "$BUNDLE_PATH" "$UNITY_PLUGIN_DIR/"
 
 if [ $? -ne 0 ]; then
@@ -61,12 +61,12 @@ echo ""
 
 # アーキテクチャ確認
 echo "[VERIFY] Checking architectures..."
-lipo -info "$UNITY_PLUGIN_DIR/DockIconPlugin.bundle/Contents/MacOS/DockIconPlugin"
+lipo -info "$UNITY_PLUGIN_DIR/UniconPlugin.bundle/Contents/MacOS/UniconPlugin"
 
 # シンボル確認
 echo ""
 echo "[VERIFY] Verifying exported symbols..."
-SYMBOLS=$(nm -gU "$UNITY_PLUGIN_DIR/DockIconPlugin.bundle/Contents/MacOS/DockIconPlugin" | grep -E "(SetDockIcon|ResetDockIcon)")
+SYMBOLS=$(nm -gU "$UNITY_PLUGIN_DIR/UniconPlugin.bundle/Contents/MacOS/UniconPlugin" | grep -E "(SetDockIcon|ResetDockIcon)")
 echo "$SYMBOLS"
 
 # 必須シンボルの確認

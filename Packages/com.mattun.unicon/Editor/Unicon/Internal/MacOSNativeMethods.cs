@@ -7,7 +7,7 @@ namespace Unicon
 {
     internal sealed class MacOSNativeMethods : INativeMethods
     {
-        private const string PluginName = "DockIconPlugin";
+        private const string PluginName = "UniconPlugin";
 
         [DllImport(PluginName)]
         private static extern void ResetDockIcon();
@@ -29,7 +29,7 @@ namespace Unicon
             }
             catch (DllNotFoundException ex)
             {
-                Debug.LogWarning($"Unicon: Plugin not found. Make sure DockIconPlugin.bundle is in Assets/Plugins/Editor/macOS/. Error: {ex.Message}");
+                Debug.LogWarning($"Unicon: Plugin not found. Make sure UniconPlugin.bundle is in Assets/Plugins/Editor/macOS/. Error: {ex.Message}");
                 return false;
             }
             catch (Exception ex)
@@ -53,7 +53,7 @@ namespace Unicon
             }
             catch (DllNotFoundException ex)
             {
-                Debug.LogWarning($"Unicon: Plugin not found. Make sure DockIconPlugin.bundle is in Plugins/Editor/macOS/. Error: {ex.Message}");
+                Debug.LogWarning($"Unicon: Plugin not found. Make sure UniconPlugin.bundle is in Plugins/Editor/macOS/. Error: {ex.Message}");
                 return false;
             }
             catch (Exception ex)
