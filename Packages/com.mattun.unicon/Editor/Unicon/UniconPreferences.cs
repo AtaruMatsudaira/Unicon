@@ -156,6 +156,25 @@ namespace Unicon
                 UniconSettings.Save();
             }
 
+#if UNITY_EDITOR_OSX
+            EditorGUI.BeginChangeCheck();
+            float fontSizeMultiplier = EditorGUILayout.Slider(
+                "Font Size Multiplier",
+                UniconSettings.BadgeTextFontSizeMultiplier,
+                0.5f,
+                2.0f
+            );
+            if (EditorGUI.EndChangeCheck())
+            {
+                UniconSettings.BadgeTextFontSizeMultiplier = fontSizeMultiplier;
+                UniconSettings.Save();
+            }
+
+            EditorGUILayout.HelpBox(
+                "Adjust the badge text font size. 1.0 is the default automatic size. Range: 0.5x to 2.0x (macOS only)",
+                MessageType.Info);
+#endif
+
             EditorGUILayout.Space(10);
 
             // Apply and Reset Buttons
@@ -173,6 +192,7 @@ namespace Unicon
                 UniconSettings.OverlayColor = new Color(1.0f, 0.5f, 0.0f, 0.3f);
                 UniconSettings.BadgeText = "";
                 UniconSettings.BadgeTextColor = Color.white;
+                UniconSettings.BadgeTextFontSizeMultiplier = 1.0f;
                 UniconSettings.Save();
 
                 if (NativeMethods.ResetIcon())
@@ -207,9 +227,10 @@ namespace Unicon
             // Get badge text settings
             string badgeText = UniconSettings.BadgeText ?? "";
             Color textColor = UniconSettings.BadgeTextColor;
+            float fontSizeMultiplier = UniconSettings.BadgeTextFontSizeMultiplier;
 
             // Apply all settings with unified API
-            if (NativeMethods.SetIconUnified(imagePath, overlayColor, badgeText, textColor))
+            if (NativeMethods.SetIconUnified(imagePath, overlayColor, badgeText, textColor, fontSizeMultiplier))
             {
                 Debug.Log($"Unicon: Applied dock icon customization - " +
                           $"Image: {(string.IsNullOrEmpty(imagePath) ? "Default" : imagePath)}, " +

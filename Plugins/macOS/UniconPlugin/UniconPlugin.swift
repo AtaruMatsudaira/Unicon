@@ -71,7 +71,8 @@ public func setDockIconUnified(
     _ imagePathPointer: UnsafePointer<CChar>?,
     _ overlayR: Float, _ overlayG: Float, _ overlayB: Float, _ overlayA: Float,
     _ textPointer: UnsafePointer<CChar>?,
-    _ textR: Float, _ textG: Float, _ textB: Float, _ textA: Float
+    _ textR: Float, _ textG: Float, _ textB: Float, _ textA: Float,
+    _ fontSizeMultiplier: Float
 ) {
     // Get base image
     var baseImage: NSImage?
@@ -117,8 +118,8 @@ public func setDockIconUnified(
                 blue: CGFloat(textB),
                 alpha: CGFloat(textA)
             )
-            resultImage = applyTextOverlay(to: resultImage, text: text, textColor: textColor)
-            NSLog("DockIconPlugin: Applied text overlay: \"%@\"", text)
+            resultImage = applyTextOverlay(to: resultImage, text: text, textColor: textColor, fontSizeMultiplier: CGFloat(fontSizeMultiplier))
+            NSLog("DockIconPlugin: Applied text overlay: \"%@\" with font size multiplier: %.2f", text, fontSizeMultiplier)
         }
     }
 
@@ -158,7 +159,7 @@ private func applyColorOverlay(to image: NSImage, color: NSColor) -> NSImage {
     return coloredImage
 }
 
-private func applyTextOverlay(to image: NSImage, text: String, textColor: NSColor) -> NSImage {
+private func applyTextOverlay(to image: NSImage, text: String, textColor: NSColor, fontSizeMultiplier: CGFloat = 1.0) -> NSImage {
     // 正方形のサイズを決定（縦横の大きい方を使用）
     let originalSize = image.size
     let maxDimension = max(originalSize.width, originalSize.height)
@@ -186,7 +187,8 @@ private func applyTextOverlay(to image: NSImage, text: String, textColor: NSColo
     let size = squareSize
 
     // フォントサイズを文字数に応じて調整
-    let fontSize = calculateFontSize(for: text, iconSize: size.height)
+    let baseFontSize = calculateFontSize(for: text, iconSize: size.height)
+    let fontSize = baseFontSize * fontSizeMultiplier
     let font = NSFont.systemFont(ofSize: fontSize, weight: .bold)
 
     // テキスト属性（2段階描画用）
