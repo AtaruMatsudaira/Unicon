@@ -68,8 +68,9 @@ namespace Unicon
             }
         }
         
-        public bool SetIconUnified(string imagePath, UnityEngine.Color overlayColor, string text, UnityEngine.Color textColor)
+        public bool SetIconUnified(string imagePath, UnityEngine.Color overlayColor, string text, UnityEngine.Color textColor, float fontSizeMultiplier)
         {
+            // fontSizeMultiplier parameter is ignored on Windows (macOS only feature)
             try
             {
                 using var iconBitmap = string.IsNullOrEmpty(imagePath)
@@ -80,7 +81,7 @@ namespace Unicon
                 {
                     return false;
                 }
-                
+
                 if (!string.IsNullOrEmpty(text))
                 {
                     WindowsBitmapModifier.ModifyBadgeText(iconBitmap, text, textColor);

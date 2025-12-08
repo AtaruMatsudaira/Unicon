@@ -19,6 +19,7 @@ namespace Unicon
         public float badgeTextColorG = 1.0f;
         public float badgeTextColorB = 1.0f;
         public float badgeTextColorA = 1.0f;
+        public float badgeTextFontSizeMultiplier = 1.0f;
     }
 
     internal static class UniconSettings
@@ -114,6 +115,20 @@ namespace Unicon
                 s_data.badgeTextColorG = value.g;
                 s_data.badgeTextColorB = value.b;
                 s_data.badgeTextColorA = value.a;
+            }
+        }
+
+        public static float BadgeTextFontSizeMultiplier
+        {
+            get
+            {
+                EnsureLoaded();
+                return s_data.badgeTextFontSizeMultiplier;
+            }
+            set
+            {
+                EnsureLoaded();
+                s_data.badgeTextFontSizeMultiplier = value;
             }
         }
 

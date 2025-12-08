@@ -17,7 +17,8 @@ namespace Unicon
             string imagePath,
             float overlayR, float overlayG, float overlayB, float overlayA,
             string text,
-            float textR, float textG, float textB, float textA
+            float textR, float textG, float textB, float textA,
+            float fontSizeMultiplier
         );
 
         public bool ResetIcon()
@@ -39,7 +40,7 @@ namespace Unicon
             }
         }
 
-        public bool SetIconUnified(string imagePath, Color overlayColor, string text, Color textColor)
+        public bool SetIconUnified(string imagePath, Color overlayColor, string text, Color textColor, float fontSizeMultiplier)
         {
             try
             {
@@ -47,7 +48,8 @@ namespace Unicon
                     imagePath ?? "",
                     overlayColor.r, overlayColor.g, overlayColor.b, overlayColor.a,
                     text ?? "",
-                    textColor.r, textColor.g, textColor.b, textColor.a
+                    textColor.r, textColor.g, textColor.b, textColor.a,
+                    fontSizeMultiplier
                 );
                 return true;
             }
