@@ -72,7 +72,7 @@ echo "$SYMBOLS"
 # 必須シンボルの確認
 echo ""
 echo "[VERIFY] Checking required symbols..."
-REQUIRED_SYMBOLS=("SetDockIconFromPath" "SetDockIconWithColorOverlay" "SetDockIconWithText" "SetDockIconUnified" "ResetDockIcon")
+REQUIRED_SYMBOLS=("SetDockIconUnified" "ResetDockIcon")
 MISSING_SYMBOLS=()
 
 for symbol in "${REQUIRED_SYMBOLS[@]}"; do
