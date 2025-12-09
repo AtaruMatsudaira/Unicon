@@ -75,7 +75,7 @@ namespace Unicon
                 return;
             }
             
-            InitializeDockIconPlugin();
+            InitializeUniconPlugin();
             IsInitializedPlugin = true;
         }
         
@@ -86,7 +86,7 @@ namespace Unicon
                 return;
             }
             
-            DestroyDockIconPlugin();
+            DestroyUniconPlugin();
             IsInitializedPlugin = false;
         }
         
@@ -151,7 +151,7 @@ namespace Unicon
         
         #region P/Invoke Declarations
 
-        private const string DllName = "DockIconPluginForWindows.dll";
+        private const string DllName = "UniconPluginForWindows.dll";
         
         [DllImport(DllName, CharSet = CharSet.Unicode)]
         private static extern IntPtr ExtractIconFromPath(string filePath, int size);
@@ -163,10 +163,10 @@ namespace Unicon
         private static extern void DeleteIcon(IntPtr hIcon);
 
         [DllImport(DllName, CharSet = CharSet.Unicode)]
-        private static extern void InitializeDockIconPlugin();
+        private static extern void InitializeUniconPlugin();
         
         [DllImport(DllName, CharSet = CharSet.Unicode)]
-        private static extern void DestroyDockIconPlugin();
+        private static extern void DestroyUniconPlugin();
         
         #endregion
     }

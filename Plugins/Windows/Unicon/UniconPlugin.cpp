@@ -175,12 +175,12 @@ extern "C"
         }
     }
 
-    DLL_EXPORT void STDCALL InitializeDockIconPlugin()
+    DLL_EXPORT void STDCALL InitializeUniconPlugin()
     {
         StartHook();
     }
 
-    DLL_EXPORT void STDCALL DestroyDockIconPlugin()
+    DLL_EXPORT void STDCALL DestroyUniconPlugin()
     {
         auto processId = GetCurrentProcessId();
         ApplyToProcessWindows(static_cast<int>(processId), L"", nullptr, nullptr);
