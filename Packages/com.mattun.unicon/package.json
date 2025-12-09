@@ -1,7 +1,7 @@
 {
   "name": "com.mattun.unicon",
   "displayName": "Unicon",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "unity": "2020.3",
   "description": "Customize Unity Editor dock icon on macOS. Change the dock icon to distinguish between multiple Unity instances running in parallel.",
   "keywords": [
