@@ -7,6 +7,8 @@ macOSとWindows上でUnity EditorのDock/タスクバーアイコンをカスタ
 ![Unity Version](https://img.shields.io/badge/unity-2020.3%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+![画面収録 2025-12-09 22 04 26](https://github.com/user-attachments/assets/798ae8d0-34bd-43c8-9cc3-ef0beae3aaac)
+
 ## 機能
 
 - **カスタム画像アイコン**: 任意の画像ファイルをDockアイコンとして使用
