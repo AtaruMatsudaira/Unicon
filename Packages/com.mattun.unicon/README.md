@@ -27,6 +27,31 @@ Customize Unity Editor dock/taskbar icon on macOS and Windows. Easily distinguis
 
 ## Installation
 
+### Via OpenUPM (Recommended)
+
+```bash
+openupm add com.mattun.unicon
+```
+
+Or add the scoped registry manually to your `Packages/manifest.json`:
+
+```json
+{
+  "scopedRegistries": [
+    {
+      "name": "package.openupm.com",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.mattun.unicon"
+      ]
+    }
+  ],
+  "dependencies": {
+    "com.mattun.unicon": "1.2.4"
+  }
+}
+```
+
 ### Via Git URL (Unity Package Manager)
 
 1. Open **Window > Package Manager**

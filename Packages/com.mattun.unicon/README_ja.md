@@ -27,6 +27,31 @@ macOSとWindows上でUnity EditorのDock/タスクバーアイコンをカスタ
 
 ## インストール
 
+### OpenUPM経由（推奨）
+
+```bash
+openupm add com.mattun.unicon
+```
+
+または、`Packages/manifest.json` に scoped registry を手動で追加:
+
+```json
+{
+  "scopedRegistries": [
+    {
+      "name": "package.openupm.com",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.mattun.unicon"
+      ]
+    }
+  ],
+  "dependencies": {
+    "com.mattun.unicon": "1.2.4"
+  }
+}
+```
+
 ### Git URL経由 (Unity Package Manager)
 
 1. **Window > Package Manager** を開く
