@@ -3,11 +3,11 @@ using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
-namespace DockIconChanger
+namespace Unicon
 {
     internal sealed class MacOSNativeMethods : INativeMethods
     {
-        private const string PluginName = "DockIconPlugin";
+        private const string PluginName = "UniconPlugin";
 
         [DllImport(PluginName)]
         private static extern void ResetDockIcon();
@@ -17,7 +17,8 @@ namespace DockIconChanger
             string imagePath,
             float overlayR, float overlayG, float overlayB, float overlayA,
             string text,
-            float textR, float textG, float textB, float textA
+            float textR, float textG, float textB, float textA,
+            float fontSizeMultiplier
         );
 
         public bool ResetIcon()
@@ -29,17 +30,17 @@ namespace DockIconChanger
             }
             catch (DllNotFoundException ex)
             {
-                Debug.LogWarning($"DockIconChanger: Plugin not found. Make sure DockIconPlugin.bundle is in Assets/Plugins/Editor/macOS/. Error: {ex.Message}");
+                Debug.LogWarning($"Unicon: Plugin not found. Make sure UniconPlugin.bundle is in Assets/Plugins/Editor/macOS/. Error: {ex.Message}");
                 return false;
             }
             catch (Exception ex)
             {
-                Debug.LogError($"DockIconChanger: Failed to reset dock icon: {ex.Message}");
+                Debug.LogError($"Unicon: Failed to reset dock icon: {ex.Message}");
                 return false;
             }
         }
 
-        public bool SetIconUnified(string imagePath, Color overlayColor, string text, Color textColor)
+        public bool SetIconUnified(string imagePath, Color overlayColor, string text, Color textColor, float fontSizeMultiplier)
         {
             try
             {
@@ -47,18 +48,19 @@ namespace DockIconChanger
                     imagePath ?? "",
                     overlayColor.r, overlayColor.g, overlayColor.b, overlayColor.a,
                     text ?? "",
-                    textColor.r, textColor.g, textColor.b, textColor.a
+                    textColor.r, textColor.g, textColor.b, textColor.a,
+                    fontSizeMultiplier
                 );
                 return true;
             }
             catch (DllNotFoundException ex)
             {
-                Debug.LogWarning($"DockIconChanger: Plugin not found. Make sure DockIconPlugin.bundle is in Plugins/Editor/macOS/. Error: {ex.Message}");
+                Debug.LogWarning($"Unicon: Plugin not found. Make sure UniconPlugin.bundle is in Plugins/Editor/macOS/. Error: {ex.Message}");
                 return false;
             }
             catch (Exception ex)
             {
-                Debug.LogError($"DockIconChanger: Failed to set unified dock icon: {ex.Message}");
+                Debug.LogError($"Unicon: Failed to set unified dock icon: {ex.Message}");
                 return false;
             }
         }

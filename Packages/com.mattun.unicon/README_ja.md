@@ -31,7 +31,7 @@ macOSとWindows上でUnity EditorのDock/タスクバーアイコンをカスタ
 
 1. **Window > Package Manager** を開く
 2. **+** ボタンをクリックして **Add package from git URL...** を選択
-3. 以下を入力: `https://github.com/mattun/Unicon.git?path=Packages/com.mattun.unicon`
+3. 以下を入力: `https://github.com/AtaruMatsudaira/Unicon.git?path=Packages/com.mattun.unicon`
 
 ### manifest.json経由
 
@@ -40,7 +40,7 @@ macOSとWindows上でUnity EditorのDock/タスクバーアイコンをカスタ
 ```json
 {
   "dependencies": {
-    "com.mattun.unicon": "https://github.com/mattun/Unicon.git?path=Packages/com.mattun.unicon"
+    "com.mattun.unicon": "https://github.com/AtaruMatsudaira/Unicon.git?path=Packages/com.mattun.unicon"
   }
 }
 ```

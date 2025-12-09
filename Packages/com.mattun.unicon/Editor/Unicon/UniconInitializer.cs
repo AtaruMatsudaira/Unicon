@@ -3,17 +3,17 @@ using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
 
-namespace DockIconChanger
+namespace Unicon
 {
     [InitializeOnLoad]
-    internal static class DockIconInitializer
+    internal static class UniconInitializer
     {
         private static int _frameCount;
         private static double _lastApplyTime;
         private const int FrameCheckInterval = 60;
         private const double ApplyInterval = 1.0;
 
-        static DockIconInitializer()
+        static UniconInitializer()
         {
 #if UNITY_EDITOR_WIN
             EditorApplication.delayCall += ApplyDockIcon;
@@ -51,42 +51,43 @@ namespace DockIconChanger
         {
             try
             {
-                DockIconSettings.Load();
+                UniconSettings.Load();
 
                 // Skip if not enabled
-                if (!DockIconSettings.Enabled)
+                if (!UniconSettings.Enabled)
                 {
                     return;
                 }
 
                 // Prepare all parameters for unified API
                 string imagePath = "";
-                if (!string.IsNullOrEmpty(DockIconSettings.IconPath) && File.Exists(DockIconSettings.IconPath))
+                if (!string.IsNullOrEmpty(UniconSettings.IconPath) && File.Exists(UniconSettings.IconPath))
                 {
-                    imagePath = DockIconSettings.IconPath;
+                    imagePath = UniconSettings.IconPath;
                 }
 
                 // Determine overlay color
                 Color overlayColor;
-                if (DockIconSettings.UseAutoColor)
+                if (UniconSettings.UseAutoColor)
                 {
-                    overlayColor = DockIconSettings.GenerateColorFromProjectName(Application.productName);
+                    overlayColor = UniconSettings.GenerateColorFromProjectName(Application.productName);
                 }
                 else
                 {
-                    overlayColor = DockIconSettings.OverlayColor;
+                    overlayColor = UniconSettings.OverlayColor;
                 }
 
                 // Get badge text settings
-                string badgeText = DockIconSettings.BadgeText ?? "";
-                Color textColor = DockIconSettings.BadgeTextColor;
+                string badgeText = UniconSettings.BadgeText ?? "";
+                Color textColor = UniconSettings.BadgeTextColor;
+                float fontSizeMultiplier = UniconSettings.BadgeTextFontSizeMultiplier;
 
                 // Apply all settings with unified API
-                NativeMethods.SetIconUnified(imagePath, overlayColor, badgeText, textColor);
+                NativeMethods.SetIconUnified(imagePath, overlayColor, badgeText, textColor, fontSizeMultiplier);
             }
             catch (System.Exception ex)
             {
-                Debug.LogError($"DockIconChanger: Failed to apply dock icon: {ex.Message}");
+                Debug.LogError($"Unicon: Failed to apply dock icon: {ex.Message}");
             }
         }
     }

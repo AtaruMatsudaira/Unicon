@@ -1,12 +1,15 @@
 {
-    "name": "DockIconChanger.Editor.Native",
-    "rootNamespace": "",
-    "references": [],
+    "name": "Unicon.Editor",
+    "rootNamespace": "Unicon",
+    "references": [
+        "GUID:2d702b2de95148be9141d7366c0766fd",
+        "Unicon.Editor.Native"
+    ],
     "includePlatforms": [
         "Editor"
     ],
     "excludePlatforms": [],
-    "allowUnsafeCode": true,
+    "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
