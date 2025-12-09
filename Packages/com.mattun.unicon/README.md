@@ -77,7 +77,7 @@ Add the following to your `Packages/manifest.json`:
 
 ### Quick Start
 
-1. Open **Edit > Preferences > Dock Icon Changer**
+1. Open **Edit > Preferences > Unicon**
 2. Enable **"Enable Custom Dock Icon"** toggle
 3. Choose one of the following:
    - **Custom Image**: Click "Browse" to select an image file
