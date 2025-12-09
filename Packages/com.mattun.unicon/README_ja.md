@@ -14,6 +14,7 @@ macOSとWindows上でUnity EditorのDock/タスクバーアイコンをカスタ
 - **カスタム画像アイコン**: 任意の画像ファイルをDockアイコンとして使用
 - **カラーオーバーレイ**: Unityアイコンに色を重ねる
 - **自動カラー生成**: プロジェクト名から一意の色を自動生成
+- **バッジテキスト**: アイコンにカスタムテキストを表示（例: "Dev", "Win", "1"）
 - **自動適用**: エディタ起動時に自動的にアイコンを適用
 - **環境設定UI**: Edit > Preferencesから簡単に設定
 
@@ -78,9 +79,10 @@ openupm add com.mattun.unicon
 
 1. **Edit > Preferences > Unicon** を開く
 2. **"Enable Custom Dock Icon"** トグルを有効化
-3. 以下のいずれかを選択:
+3. 必要に応じてカスタマイズ:
    - **カスタム画像**: "Browse"ボタンをクリックして画像ファイルを選択
    - **カラーオーバーレイ**: "Use Auto Color"を無効にして色を選択
+   - **バッジテキスト**: アイコンに表示するテキストを入力（例: "Dev", "1"）
 
 ### 自動カラー
 
@@ -94,8 +96,8 @@ openupm add com.mattun.unicon
 
 このパッケージは、ネイティブプラグインを使用してランタイムでDock/タスクバーアイコンを変更します：
 
-- **macOS**: `DockIconPlugin.bundle`（Swift）を使用し、`NSApplication.applicationIconImage` APIを活用
-- **Windows**: `DockIconPluginForWindows.dll`（C++）を使用し、Windows Shell APIを活用してタスクバーアイコンを変更
+- **macOS**: `UniconPlugin.bundle`（Swift）を使用し、`NSApplication.applicationIconImage` APIを活用
+- **Windows**: `UniconPluginForWindows.dll`（C++）を使用し、Windows Shell APIを活用してタスクバーアイコンを変更
 
 ### アーキテクチャ
 
@@ -139,36 +141,28 @@ openupm add com.mattun.unicon
 
 ## APIリファレンス
 
-### DockIconSettings
+### UniconSettings
 
 ```csharp
 // カスタムDockアイコンの有効/無効
-DockIconSettings.Enabled = true;
+UniconSettings.Enabled = true;
 
 // カスタム画像パスの設定
-DockIconSettings.IconPath = "/path/to/icon.png";
+UniconSettings.IconPath = "/path/to/icon.png";
 
 // 自動カラー生成の有効化
-DockIconSettings.UseAutoColor = true;
+UniconSettings.UseAutoColor = true;
 
 // カスタムオーバーレイカラーの設定
-DockIconSettings.OverlayColor = new Color(1f, 0.5f, 0f, 0.3f);
+UniconSettings.OverlayColor = new Color(1f, 0.5f, 0f, 0.3f);
+
+// バッジテキストの設定
+UniconSettings.BadgeText = "Dev";
+UniconSettings.BadgeTextColor = Color.white;
+UniconSettings.BadgeTextFontSizeMultiplier = 1.0f;
 
 // 設定の保存
-DockIconSettings.Save();
-```
-
-### NativeMethods
-
-```csharp
-// ファイルパスからアイコンを設定
-NativeMethods.SetIconFromPath("/path/to/icon.png");
-
-// カラーオーバーレイでアイコンを設定
-NativeMethods.SetIconWithColorOverlay(new Color(1f, 0.5f, 0f, 0.3f));
-
-// デフォルトアイコンにリセット
-NativeMethods.ResetIcon();
+UniconSettings.Save();
 ```
 
 ## トラブルシューティング
@@ -176,12 +170,12 @@ NativeMethods.ResetIcon();
 ### プラグインが読み込まれない
 
 #### macOS
-1. `DockIconPlugin.bundle` が `Packages/com.mattun.unicon/Plugins/Editor/macOS/` に存在するか確認
+1. `UniconPlugin.bundle` が `Packages/com.mattun.unicon/Plugins/Editor/macOS/` に存在するか確認
 2. Unity Editorを再起動
 3. Consoleでエラーメッセージを確認
 
 #### Windows
-1. `DockIconPluginForWindows.dll` が `Packages/com.mattun.unicon/Plugins/Editor/Windows/` に存在するか確認
+1. `UniconPluginForWindows.dll` が `Packages/com.mattun.unicon/Plugins/Editor/Windows/` に存在するか確認
 2. Unity Editorを再起動
 3. Consoleでエラーメッセージを確認
 
@@ -203,9 +197,9 @@ NativeMethods.ResetIcon();
 ### macOS用プラグイン
 
 ```bash
-cd path/to/Plugins/macOS/DockIconPlugin
-xcodebuild -project DockIconPlugin.xcodeproj \
-  -scheme DockIconPlugin \
+cd path/to/Plugins/macOS/UniconPlugin
+xcodebuild -project UniconPlugin.xcodeproj \
+  -scheme UniconPlugin \
   -configuration Release \
   -arch x86_64 -arch arm64 \
   ONLY_ACTIVE_ARCH=NO \
@@ -213,20 +207,20 @@ xcodebuild -project DockIconPlugin.xcodeproj \
   clean build
 
 # パッケージにコピー
-cp -r build/Release/DockIconPlugin.bundle \
+cp -r build/Release/UniconPlugin.bundle \
   path/to/Packages/com.mattun.unicon/Plugins/Editor/macOS/
 ```
 
 ### Windows用プラグイン
 
 ```bash
-cd path/to/Plugins/Windows/DockIconPlugin
+cd path/to/Plugins/Windows/UniconPlugin
 mkdir build && cd build
 cmake ..
 cmake --build . --config Release
 
 # パッケージにコピー
-cp Release/DockIconPluginForWindows.dll \
+cp Release/UniconPluginForWindows.dll \
   path/to/Packages/com.mattun.unicon/Plugins/Editor/Windows/
 ```
 

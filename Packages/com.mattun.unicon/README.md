@@ -15,6 +15,7 @@ Customize Unity Editor dock/taskbar icon on macOS and Windows. Easily distinguis
 - **Custom Image Icon**: Use any image file as your dock icon
 - **Color Overlay**: Apply a color overlay to the Unity icon
 - **Auto Color Generation**: Automatically generate a unique color from project name
+- **Badge Text**: Display custom text on the icon (e.g., "Dev", "Win", "1")
 - **Auto Apply**: Automatically applies icon on editor startup and script reload
 - **Preferences UI**: Easy configuration via Edit > Preferences
 
@@ -79,9 +80,10 @@ Add the following to your `Packages/manifest.json`:
 
 1. Open **Edit > Preferences > Unicon**
 2. Enable **"Enable Custom Dock Icon"** toggle
-3. Choose one of the following:
+3. Customize as needed:
    - **Custom Image**: Click "Browse" to select an image file
    - **Color Overlay**: Disable "Use Auto Color" and pick a color
+   - **Badge Text**: Enter text to display on the icon (e.g., "Dev", "1")
 
 ### Auto Color
 
@@ -95,8 +97,8 @@ Settings are saved in `UserSettings/DockIconSettings.json` and automatically exc
 
 This package uses native plugins to change the dock/taskbar icon at runtime:
 
-- **macOS**: Uses `DockIconPlugin.bundle` (Swift) that leverages `NSApplication.applicationIconImage` API
-- **Windows**: Uses `DockIconPluginForWindows.dll` (C++) that leverages Windows Shell API to change the taskbar icon
+- **macOS**: Uses `UniconPlugin.bundle` (Swift) that leverages `NSApplication.applicationIconImage` API
+- **Windows**: Uses `UniconPluginForWindows.dll` (C++) that leverages Windows Shell API to change the taskbar icon
 
 ### Architecture
 
@@ -140,36 +142,28 @@ This package uses native plugins to change the dock/taskbar icon at runtime:
 
 ## API Reference
 
-### DockIconSettings
+### UniconSettings
 
 ```csharp
 // Enable/disable custom dock icon
-DockIconSettings.Enabled = true;
+UniconSettings.Enabled = true;
 
 // Set custom image path
-DockIconSettings.IconPath = "/path/to/icon.png";
+UniconSettings.IconPath = "/path/to/icon.png";
 
 // Enable auto color generation
-DockIconSettings.UseAutoColor = true;
+UniconSettings.UseAutoColor = true;
 
 // Set custom overlay color
-DockIconSettings.OverlayColor = new Color(1f, 0.5f, 0f, 0.3f);
+UniconSettings.OverlayColor = new Color(1f, 0.5f, 0f, 0.3f);
+
+// Set badge text
+UniconSettings.BadgeText = "Dev";
+UniconSettings.BadgeTextColor = Color.white;
+UniconSettings.BadgeTextFontSizeMultiplier = 1.0f;
 
 // Save settings
-DockIconSettings.Save();
-```
-
-### NativeMethods
-
-```csharp
-// Set icon from file path
-NativeMethods.SetIconFromPath("/path/to/icon.png");
-
-// Set icon with color overlay
-NativeMethods.SetIconWithColorOverlay(new Color(1f, 0.5f, 0f, 0.3f));
-
-// Reset to default icon
-NativeMethods.ResetIcon();
+UniconSettings.Save();
 ```
 
 ## Troubleshooting
@@ -177,12 +171,12 @@ NativeMethods.ResetIcon();
 ### Plugin not loading
 
 #### macOS
-1. Check if `DockIconPlugin.bundle` exists in `Packages/com.mattun.unicon/Plugins/Editor/macOS/`
+1. Check if `UniconPlugin.bundle` exists in `Packages/com.mattun.unicon/Plugins/Editor/macOS/`
 2. Restart Unity Editor
 3. Check Console for error messages
 
 #### Windows
-1. Check if `DockIconPluginForWindows.dll` exists in `Packages/com.mattun.unicon/Plugins/Editor/Windows/`
+1. Check if `UniconPluginForWindows.dll` exists in `Packages/com.mattun.unicon/Plugins/Editor/Windows/`
 2. Restart Unity Editor
 3. Check Console for error messages
 
@@ -204,9 +198,9 @@ If you need to rebuild the native plugins:
 ### macOS Plugin
 
 ```bash
-cd path/to/Plugins/macOS/DockIconPlugin
-xcodebuild -project DockIconPlugin.xcodeproj \
-  -scheme DockIconPlugin \
+cd path/to/Plugins/macOS/UniconPlugin
+xcodebuild -project UniconPlugin.xcodeproj \
+  -scheme UniconPlugin \
   -configuration Release \
   -arch x86_64 -arch arm64 \
   ONLY_ACTIVE_ARCH=NO \
@@ -214,20 +208,20 @@ xcodebuild -project DockIconPlugin.xcodeproj \
   clean build
 
 # Copy to package
-cp -r build/Release/DockIconPlugin.bundle \
+cp -r build/Release/UniconPlugin.bundle \
   path/to/Packages/com.mattun.unicon/Plugins/Editor/macOS/
 ```
 
 ### Windows Plugin
 
 ```bash
-cd path/to/Plugins/Windows/DockIconPlugin
+cd path/to/Plugins/Windows/UniconPlugin
 mkdir build && cd build
 cmake ..
 cmake --build . --config Release
 
 # Copy to package
-cp Release/DockIconPluginForWindows.dll \
+cp Release/UniconPluginForWindows.dll \
   path/to/Packages/com.mattun.unicon/Plugins/Editor/Windows/
 ```
 
