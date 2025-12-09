@@ -1,6 +1,6 @@
 {
     "name": "Unicon.Editor.Native",
-    "rootNamespace": "",
+    "rootNamespace": "Unicon",
     "references": [],
     "includePlatforms": [
         "Editor"

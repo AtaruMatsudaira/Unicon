@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Drawing;
 using UnityEditor;
-using UnityEngine;
 
 namespace Unicon
 {
@@ -54,7 +53,7 @@ namespace Unicon
 
                 if (!string.IsNullOrEmpty(text))
                 {
-                    WindowsBitmapModifier.ModifyBadgeText(iconBitmap, text, textColor);
+                    WindowsBitmapModifier.ModifyBadgeText(iconBitmap, text, textColor, fontSizeMultiplier);
                 }
                 
                 var hIcon = iconBitmap.GetHicon();
