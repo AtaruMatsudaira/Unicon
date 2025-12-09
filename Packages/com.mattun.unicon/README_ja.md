@@ -76,7 +76,7 @@ openupm add com.mattun.unicon
 
 ### クイックスタート
 
-1. **Edit > Preferences > Dock Icon Changer** を開く
+1. **Edit > Preferences > Unicon** を開く
 2. **"Enable Custom Dock Icon"** トグルを有効化
 3. 以下のいずれかを選択:
    - **カスタム画像**: "Browse"ボタンをクリックして画像ファイルを選択
