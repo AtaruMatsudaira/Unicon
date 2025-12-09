@@ -65,7 +65,7 @@ namespace Unicon
             bmp.UnlockBits(bmpData);
         }
         
-        public static void ModifyBadgeText(Bitmap bmp, string text, UnityEngine.Color textColor)
+        public static void ModifyBadgeText(Bitmap bmp, string text, UnityEngine.Color textColor, float fontSizeMultiplier)
         {
             using var graphics = System.Drawing.Graphics.FromImage(bmp);
             graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
@@ -76,7 +76,7 @@ namespace Unicon
                 Trimming =  StringTrimming.None,
             };
             
-            var fontSize = bmp.Width / 4;
+            var fontSize = bmp.Width / 4f * fontSizeMultiplier;
             using var font = new System.Drawing.Font("Arial", fontSize, System.Drawing.FontStyle.Bold, GraphicsUnit.Pixel);
             
             var textSize = graphics.MeasureString(text, font);

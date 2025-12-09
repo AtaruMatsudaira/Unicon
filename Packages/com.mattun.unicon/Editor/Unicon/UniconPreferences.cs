@@ -156,7 +156,6 @@ namespace Unicon
                 UniconSettings.Save();
             }
 
-#if UNITY_EDITOR_OSX
             EditorGUI.BeginChangeCheck();
             float fontSizeMultiplier = EditorGUILayout.Slider(
                 "Font Size Multiplier",
@@ -169,11 +168,6 @@ namespace Unicon
                 UniconSettings.BadgeTextFontSizeMultiplier = fontSizeMultiplier;
                 UniconSettings.Save();
             }
-
-            EditorGUILayout.HelpBox(
-                "Adjust the badge text font size. 1.0 is the default automatic size. Range: 0.5x to 2.0x (macOS only)",
-                MessageType.Info);
-#endif
 
             EditorGUILayout.Space(10);
 
