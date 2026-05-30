@@ -192,18 +192,34 @@ namespace Unicon
                 return new Color(1.0f, 0.5f, 0.0f, 0.3f); // Default: Orange with transparency
             }
 
-            // Simple hash-based color generation
-            int hash = projectName.GetHashCode();
-            UnityEngine.Random.InitState(hash);
+            // Deterministic hash -> HSV. Does NOT touch UnityEngine.Random's global state.
+            // (Previously called Random.InitState, which corrupted the editor-wide RNG on every periodic re-apply.)
+            uint hash = StableHash(projectName);
 
-            float h = UnityEngine.Random.value; // Hue: 0-1
-            float s = 0.7f + UnityEngine.Random.value * 0.3f; // Saturation: 0.7-1.0
-            float v = 0.8f + UnityEngine.Random.value * 0.2f; // Value: 0.8-1.0
+            float h = (hash & 0xFFFF) / 65535f;                    // Hue: 0-1
+            float s = 0.7f + ((hash >> 16) & 0xFF) / 255f * 0.3f;  // Saturation: 0.7-1.0
+            float v = 0.8f + ((hash >> 24) & 0xFF) / 255f * 0.2f;  // Value: 0.8-1.0
 
             Color color = Color.HSVToRGB(h, s, v);
             color.a = 0.3f; // Semi-transparent overlay
 
             return color;
+        }
+
+        // FNV-1a 32-bit. Stable across runtimes/platforms
+        // (string.GetHashCode() may be randomized per-process on modern .NET).
+        private static uint StableHash(string s)
+        {
+            unchecked
+            {
+                uint hash = 2166136261u;
+                foreach (char c in s)
+                {
+                    hash ^= c;
+                    hash *= 16777619u;
+                }
+                return hash;
+            }
         }
     }
 }
