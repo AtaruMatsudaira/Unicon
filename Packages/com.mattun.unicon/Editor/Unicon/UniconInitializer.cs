@@ -78,7 +78,7 @@ namespace Unicon
                 }
 
                 // Get badge text settings
-                string badgeText = UniconSettings.BadgeText ?? "";
+                string badgeText = UniconBadgeLabelResolver.GetBadgeLabel();
                 Color textColor = UniconSettings.BadgeTextColor;
                 float fontSizeMultiplier = UniconSettings.BadgeTextFontSizeMultiplier;
 

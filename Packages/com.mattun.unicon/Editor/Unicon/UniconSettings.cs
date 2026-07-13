@@ -20,6 +20,14 @@ namespace Unicon
         public float badgeTextColorB = 1.0f;
         public float badgeTextColorA = 1.0f;
         public float badgeTextFontSizeMultiplier = 1.0f;
+        public int badgeTextSource = 0;
+        public string badgeLabelProviderTypeName = "";
+    }
+
+    internal enum BadgeTextSource
+    {
+        DirectText = 0,
+        Provider = 1,
     }
 
     internal static class UniconSettings
@@ -98,6 +106,45 @@ namespace Unicon
             {
                 EnsureLoaded();
                 s_data.badgeText = value;
+            }
+        }
+
+        public static BadgeTextSource BadgeTextSource
+        {
+            get
+            {
+                EnsureLoaded();
+                // Unknown values (hand-edited JSON) fall back to DirectText.
+                return s_data.badgeTextSource == (int)BadgeTextSource.Provider
+                    ? BadgeTextSource.Provider
+                    : BadgeTextSource.DirectText;
+            }
+            set
+            {
+                EnsureLoaded();
+                if (s_data.badgeTextSource != (int)value)
+                {
+                    s_data.badgeTextSource = (int)value;
+                    UniconBadgeLabelResolver.Invalidate();
+                }
+            }
+        }
+
+        public static string BadgeLabelProviderTypeName
+        {
+            get
+            {
+                EnsureLoaded();
+                return s_data.badgeLabelProviderTypeName;
+            }
+            set
+            {
+                EnsureLoaded();
+                if (s_data.badgeLabelProviderTypeName != value)
+                {
+                    s_data.badgeLabelProviderTypeName = value;
+                    UniconBadgeLabelResolver.Invalidate();
+                }
             }
         }
 

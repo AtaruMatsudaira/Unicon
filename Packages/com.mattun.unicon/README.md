@@ -16,6 +16,7 @@ Customize Unity Editor dock/taskbar icon on macOS and Windows. Easily distinguis
 - **Color Overlay**: Apply a color overlay to the Unity icon
 - **Auto Color Generation**: Automatically generate a unique color from project name
 - **Badge Text**: Display custom text on the icon (e.g., "Dev", "Win", "1")
+- **Badge Text Provider**: Supply the badge text from project code via a public interface (dynamic, per-project labels)
 - **Auto Apply**: Automatically applies icon on editor startup and script reload
 - **Preferences UI**: Easy configuration via Edit > Preferences
 
@@ -88,6 +89,31 @@ Add the following to your `Packages/manifest.json`:
 ### Auto Color
 
 By default, the package generates a unique color based on your project name. This is useful when you want to quickly distinguish between projects without setting custom icons.
+
+### Badge Text Provider
+
+Instead of typing the badge text manually, your project can supply it from code — e.g. the current git branch or a build flavor. Implement `IUniconLabelWrappable` in editor code:
+
+```csharp
+using Unicon;
+
+public class MyLabelProvider : IUniconLabelWrappable
+{
+    public string GetLabel()
+    {
+        return "Dev"; // e.g. compute from git branch, build flavor, etc.
+    }
+}
+```
+
+Then open **Edit > Preferences > Unicon** and select the implementation in the **Badge Text Source** popup (choose "Direct Text" to go back to manual input).
+
+Notes:
+
+- The implementation must live in editor code: a script inside an `Editor/` folder works out of the box; a custom editor asmdef must reference `Unicon.Editor`.
+- The class must be non-abstract with a public parameterless constructor.
+- `GetLabel()` runs on the editor main thread and its result is cached. It is re-evaluated on script reload, when the selection changes, and when clicking **Apply Current Settings** — keep it short and fast.
+- If the selected provider is missing or throws, Unicon logs a warning once and draws no badge.
 
 ### Settings
 
@@ -190,6 +216,17 @@ UniconSettings.Save();
 
 - Only absolute paths are supported (relative paths won't work)
 - Use NSImage-compatible formats: PNG, JPG, ICNS, etc.
+
+### Provider not listed in "Badge Text Source"
+
+1. The class must be non-abstract and implement `Unicon.IUniconLabelWrappable`
+2. It must have a public parameterless constructor
+3. It must be compiled into an editor assembly (e.g. inside an `Editor/` folder)
+4. Fix any compile errors first
+
+### Provider label not updating
+
+The provider result is cached. Click "Apply Current Settings" in Preferences or trigger a script reload to re-evaluate `GetLabel()`.
 
 ## Building the Plugins
 

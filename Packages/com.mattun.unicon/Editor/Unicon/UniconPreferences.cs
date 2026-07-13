@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -135,6 +137,11 @@ namespace Unicon
             // Badge Text Section
             EditorGUILayout.LabelField("Badge Text", EditorStyles.boldLabel);
 
+            DrawBadgeTextSourcePopup();
+
+            bool isProviderMode = UniconSettings.BadgeTextSource == BadgeTextSource.Provider;
+
+            EditorGUI.BeginDisabledGroup(isProviderMode);
             EditorGUI.BeginChangeCheck();
             string badgeText = EditorGUILayout.TextField("Badge Text", UniconSettings.BadgeText);
             if (EditorGUI.EndChangeCheck())
@@ -142,11 +149,34 @@ namespace Unicon
                 UniconSettings.BadgeText = badgeText;
                 UniconSettings.Save();
             }
+            EditorGUI.EndDisabledGroup();
 
-            EditorGUILayout.HelpBox(
-                "Display text on the dock icon (e.g., \"Win\", \"Dev\", \"1\", \"2\"). " +
-                "Recommended: 1-4 characters for optimal visibility.",
-                MessageType.Info);
+            if (isProviderMode)
+            {
+                // Reads the cached value; GetLabel() does not run per repaint.
+                string resolvedLabel = UniconBadgeLabelResolver.GetBadgeLabel();
+                EditorGUILayout.LabelField("Resolved Label",
+                    string.IsNullOrEmpty(resolvedLabel) ? "(empty)" : resolvedLabel);
+
+                if (UniconBadgeLabelResolver.LastError != null)
+                {
+                    EditorGUILayout.HelpBox(UniconBadgeLabelResolver.LastError, MessageType.Warning);
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox(
+                        "The label is provided by the selected IUniconLabelWrappable implementation. " +
+                        "It is re-evaluated on script reload and when clicking \"Apply Current Settings\".",
+                        MessageType.Info);
+                }
+            }
+            else
+            {
+                EditorGUILayout.HelpBox(
+                    "Display text on the dock icon (e.g., \"Win\", \"Dev\", \"1\", \"2\"). " +
+                    "Recommended: 1-4 characters for optimal visibility.",
+                    MessageType.Info);
+            }
 
             EditorGUI.BeginChangeCheck();
             Color badgeTextColor = EditorGUILayout.ColorField("Badge Text Color", UniconSettings.BadgeTextColor);
@@ -185,6 +215,8 @@ namespace Unicon
                 UniconSettings.UseAutoColor = true;
                 UniconSettings.OverlayColor = new Color(1.0f, 0.5f, 0.0f, 0.3f);
                 UniconSettings.BadgeText = "";
+                UniconSettings.BadgeTextSource = BadgeTextSource.DirectText;
+                UniconSettings.BadgeLabelProviderTypeName = "";
                 UniconSettings.BadgeTextColor = Color.white;
                 UniconSettings.BadgeTextFontSizeMultiplier = 1.0f;
                 UniconSettings.Save();
@@ -202,8 +234,69 @@ namespace Unicon
             EditorGUILayout.Space(10);
         }
 
+        private static void DrawBadgeTextSourcePopup()
+        {
+            List<Type> providerTypes = UniconBadgeLabelResolver.GetProviderTypes();
+
+            var options = new List<string> { "Direct Text" };
+            foreach (Type type in providerTypes)
+            {
+                options.Add(type.FullName);
+            }
+
+            int selectedIndex = 0;
+            int missingIndex = -1;
+            if (UniconSettings.BadgeTextSource == BadgeTextSource.Provider)
+            {
+                string storedTypeName = UniconSettings.BadgeLabelProviderTypeName;
+                int foundIndex = -1;
+                for (int i = 0; i < providerTypes.Count; i++)
+                {
+                    if (providerTypes[i].FullName == storedTypeName)
+                    {
+                        foundIndex = i;
+                        break;
+                    }
+                }
+
+                if (foundIndex >= 0)
+                {
+                    selectedIndex = foundIndex + 1;
+                }
+                else
+                {
+                    // Stored provider is gone (renamed/deleted) or was never selected.
+                    options.Add(string.IsNullOrEmpty(storedTypeName)
+                        ? "(None Selected)"
+                        : $"{storedTypeName} (Missing)");
+                    missingIndex = options.Count - 1;
+                    selectedIndex = missingIndex;
+                }
+            }
+
+            EditorGUI.BeginChangeCheck();
+            int newIndex = EditorGUILayout.Popup("Badge Text Source", selectedIndex, options.ToArray());
+            if (EditorGUI.EndChangeCheck() && newIndex != missingIndex)
+            {
+                if (newIndex == 0)
+                {
+                    UniconSettings.BadgeTextSource = BadgeTextSource.DirectText;
+                }
+                else
+                {
+                    UniconSettings.BadgeTextSource = BadgeTextSource.Provider;
+                    UniconSettings.BadgeLabelProviderTypeName = providerTypes[newIndex - 1].FullName;
+                }
+
+                UniconSettings.Save();
+                ApplyCurrentSettings();
+            }
+        }
+
         private static void ApplyCurrentSettings()
         {
+            // Re-evaluate the label provider on every explicit apply (user gesture).
+            UniconBadgeLabelResolver.Invalidate();
             UniconSettings.Load();
 
             // Prepare all parameters for unified API
@@ -219,7 +312,7 @@ namespace Unicon
                 : UniconSettings.OverlayColor;
 
             // Get badge text settings
-            string badgeText = UniconSettings.BadgeText ?? "";
+            string badgeText = UniconBadgeLabelResolver.GetBadgeLabel();
             Color textColor = UniconSettings.BadgeTextColor;
             float fontSizeMultiplier = UniconSettings.BadgeTextFontSizeMultiplier;
 

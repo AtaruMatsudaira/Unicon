@@ -15,6 +15,7 @@ macOSとWindows上でUnity EditorのDock/タスクバーアイコンをカスタ
 - **カラーオーバーレイ**: Unityアイコンに色を重ねる
 - **自動カラー生成**: プロジェクト名から一意の色を自動生成
 - **バッジテキスト**: アイコンにカスタムテキストを表示（例: "Dev", "Win", "1"）
+- **バッジテキストプロバイダ**: 公開インターフェース経由でプロジェクトのコードからバッジ文字列を供給（動的・プロジェクト単位のラベル）
 - **自動適用**: エディタ起動時に自動的にアイコンを適用
 - **環境設定UI**: Edit > Preferencesから簡単に設定
 
@@ -87,6 +88,31 @@ openupm add com.mattun.unicon
 ### 自動カラー
 
 デフォルトでは、パッケージがプロジェクト名に基づいて一意の色を生成します。カスタムアイコンを設定せずにプロジェクトを素早く見分けたい場合に便利です。
+
+### バッジテキストプロバイダ
+
+バッジテキストを手入力する代わりに、プロジェクトのコードから供給できます（例: gitブランチ名やビルドフレーバー）。エディタコードで `IUniconLabelWrappable` を実装します:
+
+```csharp
+using Unicon;
+
+public class MyLabelProvider : IUniconLabelWrappable
+{
+    public string GetLabel()
+    {
+        return "Dev"; // 例: gitブランチ名やビルドフレーバーから算出
+    }
+}
+```
+
+**Edit > Preferences > Unicon** を開き、**Badge Text Source** ポップアップで実装を選択します（手入力に戻すには "Direct Text" を選択）。
+
+注意事項:
+
+- 実装はエディタコードに置く必要があります。`Editor/` フォルダ内のスクリプトならそのまま動作します。独自のeditor asmdefを使う場合は `Unicon.Editor` への参照が必要です
+- クラスは非abstractで、publicなパラメータなしコンストラクタが必要です
+- `GetLabel()` はエディタのメインスレッドで実行され、結果はキャッシュされます。再評価されるのはスクリプトリロード時・選択変更時・**Apply Current Settings** クリック時です — 短く高速に保ってください
+- 選択したプロバイダが見つからない場合や例外を投げた場合、Uniconは警告を1回ログに出し、バッジを表示しません
 
 ### 設定
 
@@ -189,6 +215,17 @@ UniconSettings.Save();
 
 - 絶対パスのみサポート（相対パスは動作しません）
 - NSImage互換フォーマットを使用: PNG、JPG、ICNSなど
+
+### "Badge Text Source" に実装が表示されない
+
+1. クラスが非abstractで `Unicon.IUniconLabelWrappable` を実装しているか確認
+2. publicなパラメータなしコンストラクタがあるか確認
+3. エディタアセンブリ（例: `Editor/` フォルダ内）にコンパイルされているか確認
+4. コンパイルエラーを先に解消してください
+
+### プロバイダのラベルが更新されない
+
+プロバイダの結果はキャッシュされます。Preferencesの "Apply Current Settings" をクリックするか、スクリプトリロードを行うと `GetLabel()` が再評価されます。
 
 ## プラグインのビルド
 
