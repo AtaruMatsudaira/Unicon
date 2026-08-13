@@ -186,18 +186,7 @@ namespace Unicon
                 UniconSettings.Save();
             }
 
-            EditorGUI.BeginChangeCheck();
-            float fontSizeMultiplier = EditorGUILayout.Slider(
-                "Font Size Multiplier",
-                UniconSettings.BadgeTextFontSizeMultiplier,
-                0.5f,
-                2.0f
-            );
-            if (EditorGUI.EndChangeCheck())
-            {
-                UniconSettings.BadgeTextFontSizeMultiplier = fontSizeMultiplier;
-                UniconSettings.Save();
-            }
+            DrawBadgeTextSizeSettings();
 
             EditorGUILayout.Space(10);
 
@@ -219,6 +208,8 @@ namespace Unicon
                 UniconSettings.BadgeLabelProviderTypeName = "";
                 UniconSettings.BadgeTextColor = Color.white;
                 UniconSettings.BadgeTextFontSizeMultiplier = 1.0f;
+                UniconSettings.BadgeTextFixedFontSize = UniconSettingsData.DefaultBadgeTextFixedFontSize;
+                UniconSettings.BadgeTextSizingMode = BadgeTextSizingMode.AutomaticMultiplier;
                 UniconSettings.Save();
 
                 if (NativeMethods.ResetIcon())
@@ -232,6 +223,66 @@ namespace Unicon
             EditorGUI.EndDisabledGroup(); // End disabled group for main settings
 
             EditorGUILayout.Space(10);
+        }
+
+        private static void DrawBadgeTextSizeSettings()
+        {
+#if UNITY_EDITOR_OSX
+            BadgeTextSizingMode sizingMode = UniconSettings.BadgeTextSizingMode;
+
+            EditorGUI.BeginChangeCheck();
+            sizingMode = (BadgeTextSizingMode)EditorGUILayout.EnumPopup("Font Size Mode", sizingMode);
+            if (EditorGUI.EndChangeCheck())
+            {
+                UniconSettings.BadgeTextSizingMode = sizingMode;
+                UniconSettings.Save();
+            }
+
+            if (sizingMode == BadgeTextSizingMode.FixedSize)
+            {
+                DrawFixedFontSize();
+            }
+            else
+            {
+                DrawFontSizeMultiplier();
+            }
+
+            EditorGUILayout.HelpBox(
+                sizingMode == BadgeTextSizingMode.FixedSize
+                    ? "Use the entered point size directly for every label."
+                    : "Adjust the base font size by label length, then apply the multiplier (legacy behavior).",
+                MessageType.Info
+            );
+#else
+            DrawFontSizeMultiplier();
+#endif
+        }
+
+        private static void DrawFontSizeMultiplier()
+        {
+            EditorGUI.BeginChangeCheck();
+            float fontSizeMultiplier = EditorGUILayout.Slider(
+                "Font Size Multiplier",
+                UniconSettings.BadgeTextFontSizeMultiplier,
+                0.5f,
+                2.0f
+            );
+            if (EditorGUI.EndChangeCheck())
+            {
+                UniconSettings.BadgeTextFontSizeMultiplier = fontSizeMultiplier;
+                UniconSettings.Save();
+            }
+        }
+
+        private static void DrawFixedFontSize()
+        {
+            EditorGUI.BeginChangeCheck();
+            float fontSize = Mathf.Max(1.0f, EditorGUILayout.FloatField("Font Size (pt)", UniconSettings.BadgeTextFixedFontSize));
+            if (EditorGUI.EndChangeCheck())
+            {
+                UniconSettings.BadgeTextFixedFontSize = fontSize;
+                UniconSettings.Save();
+            }
         }
 
         private static void DrawBadgeTextSourcePopup()
@@ -314,10 +365,11 @@ namespace Unicon
             // Get badge text settings
             string badgeText = UniconBadgeLabelResolver.GetBadgeLabel();
             Color textColor = UniconSettings.BadgeTextColor;
-            float fontSizeMultiplier = UniconSettings.BadgeTextFontSizeMultiplier;
+            BadgeTextSizingMode sizingMode = UniconSettings.BadgeTextSizingMode;
+            float fontSizeValue = UniconSettings.BadgeTextFontSizeValue;
 
             // Apply all settings with unified API
-            if (NativeMethods.SetIconUnified(imagePath, overlayColor, badgeText, textColor, fontSizeMultiplier))
+            if (NativeMethods.SetIconUnified(imagePath, overlayColor, badgeText, textColor, fontSizeValue, sizingMode))
             {
                 Debug.Log($"Unicon: Applied dock icon customization - " +
                           $"Image: {(string.IsNullOrEmpty(imagePath) ? "Default" : imagePath)}, " +

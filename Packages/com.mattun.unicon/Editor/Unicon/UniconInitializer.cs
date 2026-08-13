@@ -80,10 +80,11 @@ namespace Unicon
                 // Get badge text settings
                 string badgeText = UniconBadgeLabelResolver.GetBadgeLabel();
                 Color textColor = UniconSettings.BadgeTextColor;
-                float fontSizeMultiplier = UniconSettings.BadgeTextFontSizeMultiplier;
+                BadgeTextSizingMode sizingMode = UniconSettings.BadgeTextSizingMode;
+                float fontSizeValue = UniconSettings.BadgeTextFontSizeValue;
 
                 // Apply all settings with unified API
-                NativeMethods.SetIconUnified(imagePath, overlayColor, badgeText, textColor, fontSizeMultiplier);
+                NativeMethods.SetIconUnified(imagePath, overlayColor, badgeText, textColor, fontSizeValue, sizingMode);
             }
             catch (System.Exception ex)
             {

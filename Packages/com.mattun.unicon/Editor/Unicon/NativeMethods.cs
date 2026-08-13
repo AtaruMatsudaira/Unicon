@@ -18,9 +18,9 @@ namespace Unicon
             return s_impl.ResetIcon();
         }
 
-        public static bool SetIconUnified(string imagePath, Color overlayColor, string text, Color textColor, float fontSizeMultiplier)
+        public static bool SetIconUnified(string imagePath, Color overlayColor, string text, Color textColor, float fontSizeValue, BadgeTextSizingMode sizingMode)
         {
-            return s_impl.SetIconUnified(imagePath, overlayColor, text, textColor, fontSizeMultiplier);
+            return s_impl.SetIconUnified(imagePath, overlayColor, text, textColor, fontSizeValue, sizingMode);
         }
     }
 }

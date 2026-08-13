@@ -7,6 +7,8 @@ namespace Unicon
     [Serializable]
     internal class UniconSettingsData
     {
+        internal const float DefaultBadgeTextFixedFontSize = 32.0f;
+
         public bool enabled = false;
         public string iconPath = "";
         public bool useAutoColor = true;
@@ -20,6 +22,8 @@ namespace Unicon
         public float badgeTextColorB = 1.0f;
         public float badgeTextColorA = 1.0f;
         public float badgeTextFontSizeMultiplier = 1.0f;
+        public float badgeTextFixedFontSize = DefaultBadgeTextFixedFontSize;
+        public int badgeTextSizingModeRaw = 0;
         public int badgeTextSource = 0;
         public string badgeLabelProviderTypeName = "";
     }
@@ -28,6 +32,12 @@ namespace Unicon
     {
         DirectText = 0,
         Provider = 1,
+    }
+
+    internal enum BadgeTextSizingMode
+    {
+        AutomaticMultiplier = 0,
+        FixedSize = 1,
     }
 
     internal static class UniconSettings
@@ -176,6 +186,48 @@ namespace Unicon
             {
                 EnsureLoaded();
                 s_data.badgeTextFontSizeMultiplier = value;
+            }
+        }
+
+        public static BadgeTextSizingMode BadgeTextSizingMode
+        {
+            get
+            {
+                EnsureLoaded();
+                return s_data.badgeTextSizingModeRaw == (int)BadgeTextSizingMode.FixedSize
+                    ? BadgeTextSizingMode.FixedSize
+                    : BadgeTextSizingMode.AutomaticMultiplier;
+            }
+            set
+            {
+                EnsureLoaded();
+                s_data.badgeTextSizingModeRaw = (int)value;
+            }
+        }
+
+        public static float BadgeTextFixedFontSize
+        {
+            get
+            {
+                EnsureLoaded();
+                return s_data.badgeTextFixedFontSize > 0.0f
+                    ? s_data.badgeTextFixedFontSize
+                    : UniconSettingsData.DefaultBadgeTextFixedFontSize;
+            }
+            set
+            {
+                EnsureLoaded();
+                s_data.badgeTextFixedFontSize = Mathf.Max(1.0f, value);
+            }
+        }
+
+        public static float BadgeTextFontSizeValue
+        {
+            get
+            {
+                return BadgeTextSizingMode == BadgeTextSizingMode.FixedSize
+                    ? BadgeTextFixedFontSize
+                    : BadgeTextFontSizeMultiplier;
             }
         }
 

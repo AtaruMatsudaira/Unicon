@@ -10,7 +10,7 @@ namespace Unicon
             return false;
         }
 
-        public bool SetIconUnified(string imagePath, Color overlayColor, string text, Color textColor, float fontSizeMultiplier)
+        public bool SetIconUnified(string imagePath, Color overlayColor, string text, Color textColor, float fontSizeValue, BadgeTextSizingMode sizingMode)
         {
             Debug.LogWarning("Unicon: This feature is only available on macOS Editor and Windows Editor");
             return false;
