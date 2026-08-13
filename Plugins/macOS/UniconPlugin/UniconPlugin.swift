@@ -1,5 +1,10 @@
 import Cocoa
 
+private enum BadgeTextSizingMode: Int32 {
+    case automaticMultiplier = 0
+    case fixedSize = 1
+}
+
 // Get the original Unity icon from the application bundle
 private func getUnityDefaultIcon() -> NSImage? {
     // Try to get the icon from Unity's bundle
@@ -29,7 +34,8 @@ public func setDockIconUnified(
     _ overlayR: Float, _ overlayG: Float, _ overlayB: Float, _ overlayA: Float,
     _ textPointer: UnsafePointer<CChar>?,
     _ textR: Float, _ textG: Float, _ textB: Float, _ textA: Float,
-    _ fontSizeMultiplier: Float
+    _ fontSizeValue: Float,
+    _ badgeTextSizingModeRaw: Int32
 ) {
     // Get base image
     var baseImage: NSImage?
@@ -75,8 +81,15 @@ public func setDockIconUnified(
                 blue: CGFloat(textB),
                 alpha: CGFloat(textA)
             )
-            resultImage = applyTextOverlay(to: resultImage, text: text, textColor: textColor, fontSizeMultiplier: CGFloat(fontSizeMultiplier))
-            NSLog("DockIconPlugin: Applied text overlay: \"%@\" with font size multiplier: %.2f", text, fontSizeMultiplier)
+            let sizingMode = BadgeTextSizingMode(rawValue: badgeTextSizingModeRaw) ?? .automaticMultiplier
+            resultImage = applyTextOverlay(
+                to: resultImage,
+                text: text,
+                textColor: textColor,
+                fontSizeValue: CGFloat(fontSizeValue),
+                sizingMode: sizingMode
+            )
+            NSLog("DockIconPlugin: Applied text overlay: \"%@\" with font size value: %.2f", text, fontSizeValue)
         }
     }
 
@@ -98,7 +111,13 @@ private func applyColorOverlay(to image: NSImage, color: NSColor) -> NSImage {
     return coloredImage
 }
 
-private func applyTextOverlay(to image: NSImage, text: String, textColor: NSColor, fontSizeMultiplier: CGFloat = 1.0) -> NSImage {
+private func applyTextOverlay(
+    to image: NSImage,
+    text: String,
+    textColor: NSColor,
+    fontSizeValue: CGFloat,
+    sizingMode: BadgeTextSizingMode
+) -> NSImage {
     // 正方形のサイズを決定（縦横の大きい方を使用）
     let originalSize = image.size
     let maxDimension = max(originalSize.width, originalSize.height)
@@ -125,9 +144,13 @@ private func applyTextOverlay(to image: NSImage, text: String, textColor: NSColo
 
     let size = squareSize
 
-    // フォントサイズを文字数に応じて調整
-    let baseFontSize = calculateFontSize(for: text, iconSize: size.height)
-    let fontSize = baseFontSize * fontSizeMultiplier
+    let fontSize: CGFloat
+    switch sizingMode {
+    case .automaticMultiplier:
+        fontSize = calculateFontSize(for: text, iconSize: size.height) * fontSizeValue
+    case .fixedSize:
+        fontSize = fontSizeValue
+    }
     let font = NSFont.systemFont(ofSize: fontSize, weight: .bold)
 
     // テキスト属性（2段階描画用）
@@ -184,6 +207,6 @@ private func calculateFontSize(for text: String, iconSize: CGFloat) -> CGFloat {
     case 4:
         return iconSize * 0.25
     default:
-        return iconSize * 0.22  // 4文字以上は最小サイズで固定
+        return iconSize * 0.22
     }
 }
