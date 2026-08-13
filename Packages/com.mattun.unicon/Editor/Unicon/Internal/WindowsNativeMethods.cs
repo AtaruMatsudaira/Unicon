@@ -37,7 +37,7 @@ namespace Unicon
             }
         }
         
-        public bool SetIconUnified(string imagePath, UnityEngine.Color overlayColor, string text, UnityEngine.Color textColor, float fontSizeMultiplier)
+        public bool SetIconUnified(string imagePath, UnityEngine.Color overlayColor, string text, UnityEngine.Color textColor, float fontSizeValue, BadgeTextSizingMode sizingMode)
         {
             // fontSizeMultiplier parameter is ignored on Windows (macOS only feature)
             try
@@ -53,7 +53,10 @@ namespace Unicon
 
                 if (!string.IsNullOrEmpty(text))
                 {
-                    WindowsBitmapModifier.ModifyBadgeText(iconBitmap, text, textColor, fontSizeMultiplier);
+                    float fontSize = sizingMode == BadgeTextSizingMode.FixedSize
+                        ? fontSizeValue
+                        : iconBitmap.Width / 4f * fontSizeValue;
+                    WindowsBitmapModifier.ModifyBadgeText(iconBitmap, text, textColor, fontSize);
                 }
                 
                 var hIcon = iconBitmap.GetHicon();
